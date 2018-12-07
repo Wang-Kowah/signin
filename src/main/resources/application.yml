@@ -1,0 +1,10 @@
+spring:
+  profiles:
+    active: dev
+  http:
+    encoding:
+      charset: utf-8
+      enabled: true
+server:
+  servlet:
+    context-path: /signin
