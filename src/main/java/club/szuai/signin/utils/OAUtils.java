@@ -25,17 +25,13 @@ import java.util.concurrent.TimeUnit;
 
 public class OAUtils {
     private static CloseableHttpClient httpClient;
-
-    public static void main(String args[]) {
-        loginByHttpClient("180120", "10230056");
-        getIDPhotos("C:\\Users\\Kowah\\Desktop\\pic", 2016150050, 2016150050, 5);
-    }
+    private static Map<String, String> cookieMap;
 
     /**
      * 登录OA
      */
-    public static void loginByHttpClient(String un, String pw) {
-        Map<String, String> cookieMap = new HashMap<>();
+    public static boolean loginOA(String un, String pw) {
+        cookieMap = new HashMap<>();
         String url = "https://authserver.szu.edu.cn/authserver/login";
 
         try {
@@ -43,7 +39,7 @@ public class OAUtils {
             httpClient = HttpClients.createDefault();
             HttpGet httpGet = new HttpGet(url);
             CloseableHttpResponse response = httpClient.execute(httpGet);
-            getCookies(cookieMap, response.getAllHeaders());
+            getCookies(response.getAllHeaders());
             HttpEntity entity = response.getEntity();
             String responseBody = EntityUtils.toString(entity);
 
@@ -71,33 +67,35 @@ public class OAUtils {
             httpPost.setEntity(new UrlEncodedFormEntity(pairs, "UTF-8"));
 
             response = httpClient.execute(httpPost);
-            getCookies(cookieMap, response.getAllHeaders());
+            getCookies(response.getAllHeaders());
+            //  302即可确定登录成功，无需继续请求
+            if (response.getStatusLine().getStatusCode() == 302) {
+                return true;
+            }
 
             //第三次
-            httpGet = new HttpGet("https://authserver.szu.edu.cn/authserver/index.do");
-            httpGet.setHeader("Cookie", "CASTGC=" + cookieMap.get("CASTGC")
-                    + "; route=" + cookieMap.get("route")
-                    + "; JSESSIONID_auth=" + cookieMap.get("JSESSIONID_auth")
-                    + "; org.springframework.controller.servlet.i18n.CookieLocaleResolver.LOCALE=zh_CN");
-            response = httpClient.execute(httpGet);
-            entity = response.getEntity();
-            responseBody = EntityUtils.toString(entity);
-            EntityUtils.consume(entity);
-            Document doc = Jsoup.parse(responseBody);
-            Element element = doc.getElementsByClass("auth_username").first().selectFirst("span");
-            String username = element.text();
-
-            System.out.println("登陆成功,用户名：" + username);
-
+//            httpGet = new HttpGet("https://authserver.szu.edu.cn/authserver/index.do");
+//            httpGet.setHeader("Cookie", "CASTGC=" + cookieMap.get("CASTGC")
+//                    + "; route=" + cookieMap.get("route")
+//                    + "; JSESSIONID_auth=" + cookieMap.get("JSESSIONID_auth")
+//                    + "; org.springframework.controller.servlet.i18n.CookieLocaleResolver.LOCALE=zh_CN");
+//            response = httpClient.execute(httpGet);
+//            entity = response.getEntity();
+//            responseBody = EntityUtils.toString(entity);
+//            EntityUtils.consume(entity);
+//            if (responseBody.contains("个人资料")){
+//                return true;
+//            }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     /**
      * 保存cookie
      */
-    private static void getCookies(Map<String, String> cookieMap, Header[] headers) {
+    private static void getCookies(Header[] headers) {
         for (Header header : headers) {
 //            System.out.println(header.getName() + ":" + header.getValue());
             if (header.getName().equalsIgnoreCase("Set-Cookie")) {
@@ -115,7 +113,7 @@ public class OAUtils {
     }
 
     /**
-     * 爬取校园卡照片（需登录OA）
+     * 爬取校卡照片（需登录OA）
      *
      * @param dirPath 存放的文件夹
      * @param start   开始学号
@@ -142,18 +140,58 @@ public class OAUtils {
     }
 
     /**
-     * 根据学号获取姓名
+     * 获取姓名（需登录OA）
      */
-    public static String getNameByID(int id){
-        String name = "";
+    public static String getName() {
+        String username = "";
+        try {
+            HttpGet httpGet = new HttpGet("https://authserver.szu.edu.cn/authserver/index.do");
+            httpGet.setHeader("Cookie", "CASTGC=" + cookieMap.get("CASTGC")
+                    + "; route=" + cookieMap.get("route")
+                    + "; JSESSIONID_auth=" + cookieMap.get("JSESSIONID_auth")
+                    + "; org.springframework.controller.servlet.i18n.CookieLocaleResolver.LOCALE=zh_CN");
+            CloseableHttpResponse response = httpClient.execute(httpGet);
+            HttpEntity entity = response.getEntity();
+            String responseBody = EntityUtils.toString(entity);
+            EntityUtils.consume(entity);
+            Document doc = Jsoup.parse(responseBody);
+            Element element = doc.getElementsByClass("auth_username").first().selectFirst("span");
+            username = element.text();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return username;
+    }
 
-        return name;
+    /**
+     * 获取生日（需登录OA）
+     */
+    public static long getBirthday() {
+        long timestamp = 0;
+        try {
+            HttpGet httpGet = new HttpGet("https://authserver.szu.edu.cn/authserver/userAttributesEdit.do");
+            httpGet.setHeader("Cookie", "CASTGC=" + cookieMap.get("CASTGC")
+                    + "; route=" + cookieMap.get("route")
+                    + "; JSESSIONID_auth=" + cookieMap.get("JSESSIONID_auth")
+                    + "; org.springframework.controller.servlet.i18n.CookieLocaleResolver.LOCALE=zh_CN");
+            CloseableHttpResponse response = httpClient.execute(httpGet);
+            HttpEntity entity = response.getEntity();
+            String responseBody = EntityUtils.toString(entity);
+            EntityUtils.consume(entity);
+            Document doc = Jsoup.parse(responseBody);
+            Element element = doc.getElementById("birthday");
+            String birthStr = element.attr("value");
+            timestamp = DateUtils.getTimestamp(birthStr, "yyyy-MM-dd");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return timestamp;
     }
 
     /**
      * 根据姓名获取学号
      */
-    public static int getIDByName(String name){
+    public static int getIDByName(String name) {
         int id = 0;
 
         return id;
