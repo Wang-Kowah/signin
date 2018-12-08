@@ -21,9 +21,8 @@ public enum ErrorCode {
     MSM_CODE_ERROR(4003, "短信验证码不正确"),
     MOBILE_NOT_EXIST_ERROR(4004, "该手机号码不存在"),
 
-    // 订单相关错误 5000
-    ORDER_IS_NOT_EXIST(5001, "订单不存在"),
-    ORDER_UID_ILLEGAL(5010, "用户身份不合法"),
+    // 签到相关错误 5000
+    LOCATION_TOO_FAR(5001, "定位离上课地点过远，签到失败"),
 
     // 用户相关错误码6000
     USER_IS_NOT_EXIST(6001, "用户不存在"),
@@ -33,25 +32,25 @@ public enum ErrorCode {
     USER_LOCATION_BEYOUNG_LIMIT(6051, "用户可添加位置数到达上限"),
 
     // 课程相关错误码7000
-    COURSE_OR_SCHEDULE_IS_NOT_EXIST(7001, "课程或课程计划不存在"),
+    COURSE_IS_NOT_EXIST(7001, "课程不存在"),
 
     // 支付相关错误码
     WECHAT_PAY_OPEN_ORDER_ERROR(8001, "微信下单异常,请稍后再试!");
 
-    private int    code;
+    private int code;
     private String msg;
 
-    ErrorCode(int code, String msg){
+    ErrorCode(int code, String msg) {
         this.code = code;
         this.msg = msg;
     }
 
     public static ErrorCode getErrorCodeByCode(int code) {
         for (ErrorCode error : ErrorCode.values()) {
-        if (error.getCode() == code) {
-            return error;
+            if (error.getCode() == code) {
+                return error;
+            }
         }
-    }
         return UNKNOWN_ERROR;
     }
 

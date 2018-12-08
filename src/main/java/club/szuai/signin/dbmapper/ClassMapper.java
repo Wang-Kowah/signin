@@ -20,5 +20,4 @@ public interface ClassMapper {
     int updateByPrimaryKey(Class record);
 
     List<Class> getList(int limit);
-
 }

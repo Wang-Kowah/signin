@@ -13,7 +13,7 @@ public class DateUtils {
     /**
      * 格式化日期，返回时间戳
      */
-    public static long getTimestamp(String dateStr,String pattern) throws ParseException {
+    public static long getTimestamp(String dateStr, String pattern) throws ParseException {
         SimpleDateFormat sf = new SimpleDateFormat(pattern, Locale.CHINA);
         return sf.parse(dateStr).getTime();
     }

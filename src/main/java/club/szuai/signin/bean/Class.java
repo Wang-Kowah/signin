@@ -11,6 +11,8 @@ public class Class {
 
     private Integer teacherId;
 
+    private String address;
+
     private String studentIds;
 
     public Integer getClassId() {
@@ -51,6 +53,14 @@ public class Class {
 
     public void setTeacherId(Integer teacherId) {
         this.teacherId = teacherId;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address == null ? null : address.trim();
     }
 
     public String getStudentIds() {

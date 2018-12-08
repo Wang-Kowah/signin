@@ -36,6 +36,7 @@ public class Student {
     public void setCardId(Integer cardId) {
         this.cardId = cardId;
     }
+
     public String getName() {
         return name;
     }

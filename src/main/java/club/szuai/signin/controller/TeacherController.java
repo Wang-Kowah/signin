@@ -1,10 +1,8 @@
 package club.szuai.signin.controller;
 
 import club.szuai.signin.bean.Class;
-import club.szuai.signin.bean.Student;
 import club.szuai.signin.bean.Teacher;
 import club.szuai.signin.bean.enums.ErrorCode;
-import club.szuai.signin.dbmapper.ClassMapper;
 import club.szuai.signin.dbmapper.TeacherMapper;
 import club.szuai.signin.service.ClassService;
 import org.slf4j.Logger;
@@ -12,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -64,16 +63,19 @@ public class TeacherController {
         return result;
     }
 
+    /**
+     * 获取教师任课列表
+     */
     @RequestMapping(value = "/classes")
     @ResponseBody
-    public Map<String, Object> getClassList(HttpServletRequest request, HttpServletResponse response) {
+    public Map<String, Object> getTeachingClasses(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> result = new HashMap<>();
         ErrorCode errorCode = ErrorCode.SUCCESS;
         String idStr = request.getParameter("id");
-        int id;
+        int teacher_id;
         try {
-            id=Integer.parseInt(idStr);
-        }catch (Exception e){
+            teacher_id = Integer.parseInt(idStr);
+        } catch (Exception e) {
             logger.error("Parse error,id={}", idStr);
             errorCode = ErrorCode.PARAM_ERROR;
             result.put("retcode", errorCode.getCode());
@@ -81,16 +83,85 @@ public class TeacherController {
             return result;
         }
 
-        List<Class> classes = classService.getTeachingClasses(id);
-        if (classes.isEmpty()){
+        List<Class> classes = classService.getTeachingClasses(teacher_id);
+        if (classes.isEmpty()) {
             errorCode = ErrorCode.USER_IS_NOT_EXIST;
-        }else {
+        } else {
             result.put("classes", classes);
         }
         result.put("retcode", errorCode.getCode());
         result.put("msg", errorCode.getMsg());
         return result;
     }
+
+    /**
+     * 获取点名名单
+     */
+    @RequestMapping(value = "/nameList")
+    @ResponseBody
+    public Map<String, Object> getNameList(HttpServletRequest request, HttpServletResponse response) {
+        Map<String, Object> result = new HashMap<>();
+        ErrorCode errorCode = ErrorCode.SUCCESS;
+        String idStr = request.getParameter("id");
+        int class_id;
+        try {
+            class_id = Integer.parseInt(idStr);
+        } catch (Exception e) {
+            logger.error("Parse error,id={}", idStr);
+            errorCode = ErrorCode.PARAM_ERROR;
+            result.put("retcode", errorCode.getCode());
+            result.put("msg", errorCode.getMsg());
+            return result;
+        }
+
+        Map<String, Object> nameMap = classService.getNameList(class_id);
+        if (nameMap.get("error").toString().equals("1")) {
+            errorCode = ErrorCode.COURSE_IS_NOT_EXIST;
+        } else {
+            List<String> signInList = classService.getSignInList(class_id);
+            result.put("idlist", nameMap.get("idList"));
+            result.put("namelist", nameMap.get("nameList"));
+            result.put("signinlist",signInList);
+        }
+        result.put("retcode", errorCode.getCode());
+        result.put("msg", errorCode.getMsg());
+        return result;
+    }
+
+    //TODO 不再通过发送请求来更新，直接在判断签到成功时后台更新
+//    /**
+//     * 更新签到名单
+//     */
+//    @RequestMapping(value = "/update", method = RequestMethod.POST)
+//    @ResponseBody
+//    public Map<String, Object> updateSignInList(HttpServletRequest request, HttpServletResponse response) {
+//        Map<String, Object> result = new HashMap<>();
+//        ErrorCode errorCode = ErrorCode.SUCCESS;
+//        String stuIdStr = request.getParameter("stu_id");
+//        String classIdStr = request.getParameter("class_id");
+//        int student_id, class_id;
+//        try {
+//            student_id = Integer.parseInt(stuIdStr);
+//            class_id = Integer.parseInt(classIdStr);
+//        } catch (Exception e) {
+//            logger.error("Parse error,student_id={},class_id={}", stuIdStr, classIdStr);
+//            errorCode = ErrorCode.PARAM_ERROR;
+//            result.put("retcode", errorCode.getCode());
+//            result.put("msg", errorCode.getMsg());
+//            return result;
+//        }
+//
+//        //TODO 实现签到名单逻辑
+//        boolean updated = classService.updateSignInList(class_id, student_id);
+//        if (!updated) {
+//            logger.error("Update sign_in list failed,class_id={},student_id={}", classIdStr, student_id);
+//            errorCode = ErrorCode.SYSTEM_ERROR;
+//        }
+//
+//        result.put("retcode", errorCode.getCode());
+//        result.put("msg", errorCode.getMsg());
+//        return result;
+//    }
 
 
 }
