@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="club.szuai.signin.dbmapper.LocationMapper" >
+  <resultMap id="BaseResultMap" type="club.szuai.signin.bean.Location" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="campus" property="campus" jdbcType="INTEGER" />
+    <result column="building" property="building" jdbcType="VARCHAR" />
+    <result column="lat" property="lat" jdbcType="DECIMAL" />
+    <result column="lng" property="lng" jdbcType="DECIMAL" />
+    <result column="classroom" property="classroom" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, campus, building, lat, lng, classroom
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_location_list
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_location_list
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="club.szuai.signin.bean.Location" >
+    insert into t_location_list (id, campus, building, 
+      lat, lng, classroom
+      )
+    values (#{id,jdbcType=INTEGER}, #{campus,jdbcType=INTEGER}, #{building,jdbcType=VARCHAR}, 
+      #{lat,jdbcType=DECIMAL}, #{lng,jdbcType=DECIMAL}, #{classroom,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="club.szuai.signin.bean.Location" >
+    insert into t_location_list
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="campus != null" >
+        campus,
+      </if>
+      <if test="building != null" >
+        building,
+      </if>
+      <if test="lat != null" >
+        lat,
+      </if>
+      <if test="lng != null" >
+        lng,
+      </if>
+      <if test="classroom != null" >
+        classroom,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="campus != null" >
+        #{campus,jdbcType=INTEGER},
+      </if>
+      <if test="building != null" >
+        #{building,jdbcType=VARCHAR},
+      </if>
+      <if test="lat != null" >
+        #{lat,jdbcType=DECIMAL},
+      </if>
+      <if test="lng != null" >
+        #{lng,jdbcType=DECIMAL},
+      </if>
+      <if test="classroom != null" >
+        #{classroom,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="club.szuai.signin.bean.Location" >
+    update t_location_list
+    <set >
+      <if test="campus != null" >
+        campus = #{campus,jdbcType=INTEGER},
+      </if>
+      <if test="building != null" >
+        building = #{building,jdbcType=VARCHAR},
+      </if>
+      <if test="lat != null" >
+        lat = #{lat,jdbcType=DECIMAL},
+      </if>
+      <if test="lng != null" >
+        lng = #{lng,jdbcType=DECIMAL},
+      </if>
+      <if test="classroom != null" >
+        classroom = #{classroom,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="club.szuai.signin.bean.Location" >
+    update t_location_list
+    set campus = #{campus,jdbcType=INTEGER},
+      building = #{building,jdbcType=VARCHAR},
+      lat = #{lat,jdbcType=DECIMAL},
+      lng = #{lng,jdbcType=DECIMAL},
+      classroom = #{classroom,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectByBuilding" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from t_location_list
+    where building = #{building,jdbcType=VARCHAR}
+  </select>
+</mapper>
