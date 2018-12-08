@@ -2,6 +2,9 @@ package club.szuai.signin.dbmapper;
 
 import club.szuai.signin.bean.Teacher;
 
+import java.util.List;
+import java.util.Map;
+
 public interface TeacherMapper {
     int deleteByPrimaryKey(Integer teacherId);
 
@@ -14,4 +17,7 @@ public interface TeacherMapper {
     int updateByPrimaryKeySelective(Teacher record);
 
     int updateByPrimaryKey(Teacher record);
+
+    List<Teacher> getList(Map<String, Object> params);
+
 }

@@ -10,4 +10,8 @@ public interface ClassService {
 
     List<Class> getList(int limit);
 
+    List<Class> getClasses(int studentId);
+
+    List<Class> getTeachingClasses(int teacherId);
+
 }

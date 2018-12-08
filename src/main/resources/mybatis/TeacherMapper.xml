@@ -90,4 +90,9 @@
       class_ids = #{classIds,jdbcType=VARCHAR}
     where teacher_id = #{teacherId,jdbcType=INTEGER}
   </update>
+  <select id="getList" resultMap="BaseResultMap">
+  SELECT * FROM t_teacher_list
+  ORDER BY `teacher_id` DESC
+  <if test="null != limit">LIMIT #{limit}</if>
+  </select>
 </mapper>

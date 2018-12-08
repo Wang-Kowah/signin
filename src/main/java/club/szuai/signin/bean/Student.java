@@ -1,7 +1,11 @@
 package club.szuai.signin.bean;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Student {
     private Integer studentId;
+
+    private Integer cardId;
 
     private String name;
 
@@ -11,8 +15,10 @@ public class Student {
 
     private String classIds;
 
+    @JsonIgnore
     private Integer sex;
 
+    @JsonIgnore
     private String wechat;
 
     public Integer getStudentId() {
@@ -23,6 +29,13 @@ public class Student {
         this.studentId = studentId;
     }
 
+    public Integer getCardId() {
+        return cardId;
+    }
+
+    public void setCardId(Integer cardId) {
+        this.cardId = cardId;
+    }
     public String getName() {
         return name;
     }

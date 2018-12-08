@@ -19,4 +19,7 @@ public interface StudentMapper {
     int updateByPrimaryKey(Student record);
 
     List<Student> getList(Map<String, Object> params);
+
+    Student selectByCardId(Integer cardId);
+
 }

@@ -3,6 +3,7 @@
 <mapper namespace="club.szuai.signin.dbmapper.StudentMapper" >
   <resultMap id="BaseResultMap" type="club.szuai.signin.bean.Student" >
     <id column="student_id" property="studentId" jdbcType="INTEGER" />
+    <id column="card_id" property="cardId" jdbcType="INTEGER" />
     <result column="name" property="name" jdbcType="VARCHAR" />
     <result column="password" property="password" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="INTEGER" />
@@ -11,7 +12,7 @@
     <result column="wechat" property="wechat" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    student_id, name, password, create_time, class_ids, sex, wechat
+    student_id,card_id, name, password, create_time, class_ids, sex, wechat
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -24,10 +25,10 @@
     where student_id = #{studentId,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="club.szuai.signin.bean.Student" >
-    insert into t_student_list (student_id, name, password, 
+    insert into t_student_list (student_id,card_id, name, password,
       create_time, class_ids, sex, 
       wechat)
-    values (#{studentId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+    values (#{studentId,jdbcType=INTEGER}, #{studentId,jdbcType=INTEGER},#{name,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
       #{createTime,jdbcType=INTEGER}, #{classIds,jdbcType=VARCHAR}, #{sex,jdbcType=INTEGER}, 
       #{wechat,jdbcType=VARCHAR})
   </insert>
@@ -36,6 +37,9 @@
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="studentId != null" >
         student_id,
+      </if>
+      <if test="cardId != null" >
+        card_id,
       </if>
       <if test="name != null" >
         name,
@@ -60,6 +64,9 @@
       <if test="studentId != null" >
         #{studentId,jdbcType=INTEGER},
       </if>
+      <if test="cardId != null" >
+        #{cardId,jdbcType=INTEGER},
+      </if>
       <if test="name != null" >
         #{name,jdbcType=VARCHAR},
       </if>
@@ -83,6 +90,9 @@
   <update id="updateByPrimaryKeySelective" parameterType="club.szuai.signin.bean.Student" >
     update t_student_list
     <set >
+      <if test="cardId != null" >
+        #{cardId,jdbcType=INTEGER},
+      </if>
       <if test="name != null" >
         name = #{name,jdbcType=VARCHAR},
       </if>
@@ -106,7 +116,9 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="club.szuai.signin.bean.Student" >
     update t_student_list
-    set name = #{name,jdbcType=VARCHAR},
+    set
+      card_id = #{cardId,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
       password = #{password,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=INTEGER},
       class_ids = #{classIds,jdbcType=VARCHAR},
@@ -118,5 +130,11 @@
     SELECT * FROM t_student_list
     ORDER BY `student_id` DESC
     <if test="null != limit">LIMIT #{limit}</if>
+  </select>
+  <select id="selectByCardId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from t_student_list
+    where card_id = #{cardId,jdbcType=INTEGER}
   </select>
 </mapper>
