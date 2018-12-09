@@ -6,7 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class DateUtils {
+public class DateUtil {
 
     final static String defaultPattern = "yyyy/MM/dd hh:mm:ss";
 
@@ -37,11 +37,7 @@ public class DateUtils {
     }
 
     /**
-     * 获得当前时间戳往前i月份的开始时间戳
-     *
-     * @param timestamp 月份时间戳
-     * @param i         往前几个月
-     * @return
+     * 获取当前时间戳往前i月份的开始时间戳
      */
     public static long getMonthBeginTimestamp(long timestamp, int i) {
         Calendar c = Calendar.getInstance();
@@ -63,11 +59,7 @@ public class DateUtils {
     }
 
     /**
-     * 获得当前时间戳往后i月份的结束时间戳
-     *
-     * @param timestamp 月份时间戳
-     * @param i         往后几个月
-     * @return
+     * 获取当前时间戳往后i月份的结束时间戳
      */
     public static long getMonthEndTimestamp(long timestamp, int i) {
         Calendar c = Calendar.getInstance();
@@ -89,11 +81,7 @@ public class DateUtils {
     }
 
     /**
-     * 获得当前时间戳往前i天的开始时间戳
-     *
-     * @param timestamp 时间戳
-     * @param i         往前几天
-     * @return
+     * 获取当前时间戳往前i天的开始时间戳
      */
     public static long getDayBeginTimestamp(long timestamp, int i) {
         Calendar c = Calendar.getInstance();
@@ -112,10 +100,61 @@ public class DateUtils {
         return c.getTimeInMillis();
     }
 
+    /**
+     * 获取本周周一的开始时间戳
+     */
+    public static long getWeekBeginTimestamp(long timestamp) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date(timestamp));
+
+        //设为周一
+        c.setFirstDayOfWeek(Calendar.MONDAY);
+        c.set(Calendar.DAY_OF_WEEK, c.getFirstDayOfWeek());
+        //将小时至0
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        //将分钟至0
+        c.set(Calendar.MINUTE, 0);
+        //将秒至0
+        c.set(Calendar.SECOND, 0);
+        //将毫秒至0
+        c.set(Calendar.MILLISECOND, 0);
+        // 获取当天零点的时间戳
+        return c.getTimeInMillis();
+    }
+    /**
+     * 获取当前分钟的开始时间戳
+     */
+    public static long getMinuteBeginTimestamp(long timestamp) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date(timestamp));
+
+        //将秒至0
+        c.set(Calendar.SECOND, 0);
+        //将毫秒至0
+        c.set(Calendar.MILLISECOND, 0);
+        return c.getTimeInMillis();
+    }
+
+    /**
+     * 获取本学期开学时间戳
+     */
+    public static long getSemesterBeginTimestamp(long timestamp) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date(timestamp));
+
+        long MarchTime = getMonthBeginTimestamp(timestamp, c.get(Calendar.MONTH) - Calendar.MARCH);
+        long SeptemberTime = getMonthBeginTimestamp(timestamp, c.get(Calendar.MONTH) - Calendar.SEPTEMBER);
+        return (timestamp - MarchTime) < (timestamp - SeptemberTime) ? MarchTime : SeptemberTime;
+    }
+
+
     public static void main(String[] args) {
-        System.out.println(formatDate(System.currentTimeMillis(), "yyyy/MM/dd HH:mm:ss:SSS"));
+        long currentTimeMillis = System.currentTimeMillis();
+        System.out.println(formatDate(currentTimeMillis, "yyyy/MM/dd HH:mm:ss:SSS"));
         System.out.println(getMonthBeginTimestamp(1515334200000L, 1));
         System.out.println(getMonthEndTimestamp(1515334200000L, 1));
+        System.out.println((int) (DateUtil.getWeekBeginTimestamp(currentTimeMillis) / 1000));
+        System.out.println(getSemesterBeginTimestamp(currentTimeMillis));
     }
 
 }

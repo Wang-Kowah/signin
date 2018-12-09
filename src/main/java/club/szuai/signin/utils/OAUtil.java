@@ -1,5 +1,6 @@
 package club.szuai.signin.utils;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -14,6 +15,7 @@ import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,20 +25,52 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class OAUtils {
+public class OAUtil {
     private static CloseableHttpClient httpClient;
     private static Map<String, String> cookieMap;
+
+    /**
+     * 复用httpclient
+     */
+    private static CloseableHttpClient getHttpClient() {
+        if (cookieMap == null)
+            cookieMap = new HashMap<>();
+        if (httpClient == null)
+            return HttpClients.createDefault();
+        else
+            return httpClient;
+    }
+
+    /**
+     * 保存cookie
+     */
+    private static void getCookies(Header[] headers) {
+        for (Header header : headers) {
+//            System.out.println(header.getName() + ":" + header.getValue());
+            if (header.getName().equalsIgnoreCase("Set-Cookie")) {
+                String[] cookies = header.getValue().split(";");
+                for (String cookiePair : cookies) {
+                    if (cookiePair.contains("=")) {
+                        String[] cookie = cookiePair.split("=");
+                        if (cookie.length == 2) {
+                            cookieMap.put(cookie[0], cookie[1]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     /**
      * 登录OA
      */
     public static boolean loginOA(String un, String pw) {
-        cookieMap = new HashMap<>();
         String url = "https://authserver.szu.edu.cn/authserver/login";
 
         try {
             //第一次
-            httpClient = HttpClients.createDefault();
+            httpClient = getHttpClient();
             HttpGet httpGet = new HttpGet(url);
             CloseableHttpResponse response = httpClient.execute(httpGet);
             getCookies(response.getAllHeaders());
@@ -93,26 +127,6 @@ public class OAUtils {
     }
 
     /**
-     * 保存cookie
-     */
-    private static void getCookies(Header[] headers) {
-        for (Header header : headers) {
-//            System.out.println(header.getName() + ":" + header.getValue());
-            if (header.getName().equalsIgnoreCase("Set-Cookie")) {
-                String[] cookies = header.getValue().split(";");
-                for (String cookiePair : cookies) {
-                    if (cookiePair.contains("=")) {
-                        String[] cookie = cookiePair.split("=");
-                        if (cookie.length == 2) {
-                            cookieMap.put(cookie[0], cookie[1]);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * 爬取校卡照片（需登录OA）
      *
      * @param dirPath 存放的文件夹
@@ -122,6 +136,7 @@ public class OAUtils {
      */
     public static void getIDPhotos(String dirPath, int start, int end, int pause) {
         try {
+            httpClient = getHttpClient();
             for (int id = start; id <= end; id++) {
                 HttpGet httpGet = new HttpGet("http://ehall.szu.edu.cn/jwapp/sys/jwpubapp/showImageBydsForZPGL.do?XH=" + id + "&ZPLX=XJZP");
                 CloseableHttpResponse response = httpClient.execute(httpGet);
@@ -144,6 +159,7 @@ public class OAUtils {
      */
     public static String getName() {
         String username = "";
+        httpClient = getHttpClient();
         try {
             HttpGet httpGet = new HttpGet("https://authserver.szu.edu.cn/authserver/index.do");
             httpGet.setHeader("Cookie", "CASTGC=" + cookieMap.get("CASTGC")
@@ -168,6 +184,7 @@ public class OAUtils {
      */
     public static long getBirthday() {
         long timestamp = 0;
+        httpClient = getHttpClient();
         try {
             HttpGet httpGet = new HttpGet("https://authserver.szu.edu.cn/authserver/userAttributesEdit.do");
             httpGet.setHeader("Cookie", "CASTGC=" + cookieMap.get("CASTGC")
@@ -181,11 +198,30 @@ public class OAUtils {
             Document doc = Jsoup.parse(responseBody);
             Element element = doc.getElementById("birthday");
             String birthStr = element.attr("value");
-            timestamp = DateUtils.getTimestamp(birthStr, "yyyy-MM-dd");
+            timestamp = DateUtil.getTimestamp(birthStr, "yyyy-MM-dd");
         } catch (Exception e) {
             e.printStackTrace();
         }
         return timestamp;
+    }
+
+    /**
+     * 获取当前为本学期第几周
+     */
+    public static int getWeekOfSemester() {
+        int week = 0;
+        try {
+            HttpGet httpGet = new HttpGet("https://www1.szu.edu.cn/szu.asp");
+            CloseableHttpResponse response = HttpClients.createDefault().execute(httpGet);
+            HttpEntity entity = response.getEntity();
+            String responseBody = EntityUtils.toString(entity, "gb2312");
+            EntityUtils.consume(entity);
+            int end = responseBody.indexOf("(查看校历)");
+            week = Integer.parseInt(responseBody.substring(end - 7, end - 5));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return week;
     }
 
     /**
@@ -195,6 +231,83 @@ public class OAUtils {
         int id = 0;
 
         return id;
+    }
+
+    /**
+     * 获取专业名单
+     */
+    public static JSONObject getIDByCollegeAndMajor(String dirPath) {
+        JSONObject result = new JSONObject();
+        httpClient = getHttpClient();
+        try {
+            //学院
+            HttpGet httpGet = new HttpGet("http://192.168.2.20/axsxx/xy.ASP");
+            CloseableHttpResponse response = httpClient.execute(httpGet);
+            getCookies(response.getAllHeaders());
+            HttpEntity entity = response.getEntity();
+            String responseBody = EntityUtils.toString(entity, "gb2312");
+            EntityUtils.consume(entity);
+            Document document = Jsoup.parse(responseBody);
+            Elements elements = document.select("option");
+            List<String> colleges = elements.eachAttr("value");
+//            System.out.println(colleges);
+
+            //班级
+            for (String college : colleges) {
+                HttpPost httpPost = new HttpPost("http://192.168.2.20/axsxx/xy1.asp");
+                httpPost.setHeader("Cookie", cookieMap.get("ASPSESSIONIDQSCSQBAA"));
+                //组装表单
+                List<NameValuePair> pairs = new ArrayList<>();
+                pairs.add(new BasicNameValuePair("bh", college));
+                pairs.add(new BasicNameValuePair("SUBMIT", "查询"));
+                httpPost.setEntity(new UrlEncodedFormEntity(pairs, "gb2312"));
+                response = httpClient.execute(httpPost);
+                getCookies(response.getAllHeaders());
+                entity = response.getEntity();
+                responseBody = EntityUtils.toString(entity, "gb2312");
+                EntityUtils.consume(entity);
+                document = Jsoup.parse(responseBody);
+                elements = document.select("option");
+                List<String> classes = elements.eachText();
+//                System.out.println(classes);
+
+                //名单
+                for (String className : classes) {
+                    if (className.contains("2016") || className.contains("2017")) {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        httpPost = new HttpPost("http://192.168.2.20/axsxx/xy2.asp");
+                        httpPost.setHeader("Cookie", cookieMap.get("ASPSESSIONIDQSCSQBAA"));
+                        //组装表单
+                        pairs = new ArrayList<>();
+                        pairs.add(new BasicNameValuePair("bh", className));
+                        pairs.add(new BasicNameValuePair("SUBMIT", "查询"));
+                        httpPost.setEntity(new UrlEncodedFormEntity(pairs, "gb2312"));
+                        response = httpClient.execute(httpPost);
+                        getCookies(response.getAllHeaders());
+                        entity = response.getEntity();
+                        responseBody = EntityUtils.toString(entity, "GBK"); //GBK包含gb2312
+                        EntityUtils.consume(entity);
+                        document = Jsoup.parse(responseBody);
+                        elements = document.select("tr");
+                        for (Element element : elements.tagName("tr")) {
+                            Elements elms = element.getElementsByTag("td");
+                            for (Element elm : elms.tagName("td")) {
+                                String info = elm.text();
+                                stringBuilder.append(info);
+                                if (!elm.equals(elms.last()))
+                                    stringBuilder.append(",");
+                            }
+                            stringBuilder.append("\n");
+                        }
+                        FileUtil.write(dirPath + File.separator + college.trim(), className + ".csv", stringBuilder.toString());
+                        TimeUnit.SECONDS.sleep(2);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
 }

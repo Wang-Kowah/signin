@@ -1,10 +1,14 @@
 package club.szuai.signin.controller;
 
 import club.szuai.signin.bean.Class;
+import club.szuai.signin.bean.SignIn;
 import club.szuai.signin.bean.Teacher;
 import club.szuai.signin.bean.enums.ErrorCode;
+import club.szuai.signin.dbmapper.SignInMapper;
 import club.szuai.signin.dbmapper.TeacherMapper;
-import club.szuai.signin.service.ClassService;
+import club.szuai.signin.service.CommonService;
+import club.szuai.signin.utils.DateUtil;
+import club.szuai.signin.utils.QRCodeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Controller
 @RequestMapping(value = "/tch")
@@ -30,7 +35,10 @@ public class TeacherController {
     private static final int DEFUALT_UNIT_COUNT_PAGES = 10;
 
     @Autowired
-    private ClassService classService;
+    private CommonService commonService;
+
+    @Autowired
+    private SignInMapper signInMapper;
 
     @Autowired
     private TeacherMapper teacherMapper;
@@ -83,9 +91,9 @@ public class TeacherController {
             return result;
         }
 
-        List<Class> classes = classService.getTeachingClasses(teacher_id);
+        List<Class> classes = commonService.getTeachingClasses(teacher_id);
         if (classes.isEmpty()) {
-            errorCode = ErrorCode.USER_IS_NOT_EXIST;
+            errorCode = ErrorCode.COURSE_IS_NOT_EXIST;
         } else {
             result.put("classes", classes);
         }
@@ -102,7 +110,7 @@ public class TeacherController {
     public Map<String, Object> getNameList(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> result = new HashMap<>();
         ErrorCode errorCode = ErrorCode.SUCCESS;
-        String idStr = request.getParameter("id");
+        String idStr = request.getParameter("class_id");
         int class_id;
         try {
             class_id = Integer.parseInt(idStr);
@@ -114,54 +122,87 @@ public class TeacherController {
             return result;
         }
 
-        Map<String, Object> nameMap = classService.getNameList(class_id);
+        Map<String, Object> nameMap = commonService.getNameList(class_id);
         if (nameMap.get("error").toString().equals("1")) {
             errorCode = ErrorCode.COURSE_IS_NOT_EXIST;
         } else {
-            List<String> signInList = classService.getSignInList(class_id);
+            List<String> signInList = commonService.getSignInList(class_id);
             result.put("idlist", nameMap.get("idList"));
             result.put("namelist", nameMap.get("nameList"));
-            result.put("signinlist",signInList);
+            result.put("signinlist", signInList);
         }
         result.put("retcode", errorCode.getCode());
         result.put("msg", errorCode.getMsg());
         return result;
     }
 
-    //TODO 不再通过发送请求来更新，直接在判断签到成功时后台更新
-//    /**
-//     * 更新签到名单
-//     */
-//    @RequestMapping(value = "/update", method = RequestMethod.POST)
-//    @ResponseBody
-//    public Map<String, Object> updateSignInList(HttpServletRequest request, HttpServletResponse response) {
-//        Map<String, Object> result = new HashMap<>();
-//        ErrorCode errorCode = ErrorCode.SUCCESS;
-//        String stuIdStr = request.getParameter("stu_id");
-//        String classIdStr = request.getParameter("class_id");
-//        int student_id, class_id;
-//        try {
-//            student_id = Integer.parseInt(stuIdStr);
-//            class_id = Integer.parseInt(classIdStr);
-//        } catch (Exception e) {
-//            logger.error("Parse error,student_id={},class_id={}", stuIdStr, classIdStr);
-//            errorCode = ErrorCode.PARAM_ERROR;
-//            result.put("retcode", errorCode.getCode());
-//            result.put("msg", errorCode.getMsg());
-//            return result;
-//        }
-//
-//        //TODO 实现签到名单逻辑
-//        boolean updated = classService.updateSignInList(class_id, student_id);
-//        if (!updated) {
-//            logger.error("Update sign_in list failed,class_id={},student_id={}", classIdStr, student_id);
-//            errorCode = ErrorCode.SYSTEM_ERROR;
-//        }
-//
-//        result.put("retcode", errorCode.getCode());
-//        result.put("msg", errorCode.getMsg());
-//        return result;
-//    }
+    /**
+     * 获取点名历史记录
+     */
+    @RequestMapping(value = "/history")
+    @ResponseBody
+    public Map<String, Object> getSignInHistory(HttpServletRequest request, HttpServletResponse response) {
+        Map<String, Object> result = new HashMap<>();
+        ErrorCode errorCode = ErrorCode.SUCCESS;
+        String idStr = request.getParameter("class_id");
+        int class_id;
+        try {
+            class_id = Integer.parseInt(idStr);
+        } catch (Exception e) {
+            logger.error("Parse error,id={}", idStr);
+            errorCode = ErrorCode.PARAM_ERROR;
+            result.put("retcode", errorCode.getCode());
+            result.put("msg", errorCode.getMsg());
+            return result;
+        }
 
+        Map<String, Object> params = new HashMap<>();
+        params.put("classId", class_id);
+        List<SignIn> signInHistory = signInMapper.selectByClassId(params);
+        result.put("signinlist", signInHistory);
+
+        result.put("retcode", errorCode.getCode());
+        result.put("msg", errorCode.getMsg());
+        return result;
+    }
+
+    /**
+     * 获取签到二维码
+     */
+    @RequestMapping(value = "/QRCode")//,method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> getQRCode(HttpServletRequest request, HttpServletResponse response) {
+        Map<String, Object> result = new HashMap<>();
+        ErrorCode errorCode = ErrorCode.SUCCESS;
+        String idStr = request.getParameter("class_id");
+        int class_id;
+        try {
+            class_id = Integer.parseInt(idStr);
+        } catch (Exception e) {
+            logger.error("Parse error,id={}", idStr);
+            errorCode = ErrorCode.PARAM_ERROR;
+            result.put("retcode", errorCode.getCode());
+            result.put("msg", errorCode.getMsg());
+            return result;
+        }
+
+        try {
+            ServletOutputStream stream = response.getOutputStream();
+
+            long timestamp = DateUtil.getMinuteBeginTimestamp(System.currentTimeMillis()) / 1000;
+            String url = "https://szuai.club/signin/stu/signin?class_id=" + class_id + "valid=" + timestamp;
+//            System.out.println(url);
+            QRCodeUtil.generateToStream(800, 800, url, "png", stream);
+
+            stream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            errorCode = ErrorCode.SYSTEM_ERROR;
+        }
+
+        result.put("retcode", errorCode.getCode());
+        result.put("msg", errorCode.getMsg());
+        return result;
+    }
 
 }

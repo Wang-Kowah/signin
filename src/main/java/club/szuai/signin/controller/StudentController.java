@@ -4,9 +4,10 @@ import club.szuai.signin.bean.Class;
 import club.szuai.signin.bean.Student;
 import club.szuai.signin.bean.enums.ErrorCode;
 import club.szuai.signin.dbmapper.StudentMapper;
-import club.szuai.signin.service.ClassService;
+import club.szuai.signin.service.CommonService;
+import club.szuai.signin.utils.DateUtil;
 import club.szuai.signin.utils.LatAndLongitudeUtil;
-import club.szuai.signin.utils.OAUtils;
+import club.szuai.signin.utils.OAUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ public class StudentController {
     private static final int DEFUALT_SIGN_IN_DISTANCE = 50;
 
     @Autowired
-    private ClassService classService;
+    private CommonService commonService;
 
     @Autowired
     private StudentMapper studentMapper;
@@ -98,9 +99,9 @@ public class StudentController {
             //数据库中找不到该学生时通过OA来验证身份
             logger.debug("Card_id:{} not found,trying to login OA", card_id);
             //实例化httpclient
-            OAUtils oaUtils = new OAUtils();
-            if (oaUtils.loginOA(idStr, pwStr)) {
-                result.put("name", oaUtils.getName());
+            OAUtil oaUtil = new OAUtil();
+            if (oaUtil.loginOA(idStr, pwStr)) {
+                result.put("name", oaUtil.getName());
             } else {
                 errorCode = ErrorCode.LOGIN_FAIL;
             }
@@ -130,7 +131,7 @@ public class StudentController {
             return result;
         }
 
-        List<Class> classes = classService.getClasses(student_id);
+        List<Class> classes = commonService.getClasses(student_id);
         if (classes.isEmpty()) {
             errorCode = ErrorCode.USER_IS_NOT_EXIST;
         } else {
@@ -153,23 +154,32 @@ public class StudentController {
         String classIdStr = request.getParameter("class_id");
         String latStr = request.getParameter("lat");
         String lngStr = request.getParameter("lng");
+        String timeStr = request.getParameter("valid");
         int student_id, class_id;
-        BigDecimal lat;
-        BigDecimal lng;
+        long timestamp;
+        BigDecimal lat, lng;
         try {
             student_id = Integer.parseInt(stuIdStr);
             class_id = Integer.parseInt(classIdStr);
             lat = new BigDecimal(latStr);
             lng = new BigDecimal(lngStr);
+            timestamp = Long.parseLong(timeStr);
         } catch (Exception e) {
-            logger.error("Parse error,student_id={},class_id={},lat={},lng={}", stuIdStr, classIdStr, latStr, lngStr);
+            logger.error("Parse error,student_id={},class_id={},lat={},lng={},timestamp={}", stuIdStr, classIdStr, latStr, lngStr, timeStr);
             errorCode = ErrorCode.PARAM_ERROR;
             result.put("retcode", errorCode.getCode());
             result.put("msg", errorCode.getMsg());
             return result;
         }
+        //一分钟内请求否则拒绝
+        if (timestamp < DateUtil.getMinuteBeginTimestamp(System.currentTimeMillis())) {
+            errorCode = ErrorCode.TIME_OUT;
+            result.put("retcode", errorCode.getCode());
+            result.put("msg", errorCode.getMsg());
+            return result;
+        }
 
-        Map<String, Object> classLocation = classService.getClassroomLocation(class_id);
+        Map<String, Object> classLocation = commonService.getClassroomLocation(class_id);
         if (classLocation.get("error").toString().equals("1")) {
             errorCode = ErrorCode.SYSTEM_ERROR;
         } else {
@@ -180,14 +190,44 @@ public class StudentController {
 
                 if (distance > DEFUALT_SIGN_IN_DISTANCE) {
                     errorCode = ErrorCode.LOCATION_TOO_FAR;
-                }else {
-                    classService.updateSignInList(class_id,student_id);
                 }
-                result.put("distance",distance);
+                result.put("distance", distance);
             } catch (Exception e) {
                 logger.error("Can't get classroom's location,class_id={}", classIdStr);
                 errorCode = ErrorCode.SYSTEM_ERROR;
             }
+        }
+        result.put("retcode", errorCode.getCode());
+        result.put("msg", errorCode.getMsg());
+        return result;
+    }
+
+    /**
+     * 更新签到状态
+     */
+    @RequestMapping(value = "/updateStatus", method = RequestMethod.POST)
+    @ResponseBody
+    public Map<String, Object> updateStatus(HttpServletRequest request, HttpServletResponse response) {
+        Map<String, Object> result = new HashMap<>();
+        ErrorCode errorCode = ErrorCode.SUCCESS;
+        String stuIdStr = request.getParameter("stu_id");
+        String classIdStr = request.getParameter("class_id");
+        int student_id, class_id;
+        try {
+            student_id = Integer.parseInt(stuIdStr);
+            class_id = Integer.parseInt(classIdStr);
+        } catch (Exception e) {
+            logger.error("Parse error,student_id={},class_id={}", stuIdStr, classIdStr);
+            errorCode = ErrorCode.PARAM_ERROR;
+            result.put("retcode", errorCode.getCode());
+            result.put("msg", errorCode.getMsg());
+            return result;
+        }
+        try {
+            commonService.updateSignInList(class_id, student_id);
+        } catch (Exception e) {
+            logger.error("Can't update sign_in status,student_id={},class_id={}", stuIdStr, classIdStr);
+            errorCode = ErrorCode.SYSTEM_ERROR;
         }
         result.put("retcode", errorCode.getCode());
         result.put("msg", errorCode.getMsg());

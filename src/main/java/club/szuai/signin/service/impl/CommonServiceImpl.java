@@ -1,14 +1,13 @@
 package club.szuai.signin.service.impl;
 
 import club.szuai.signin.bean.Class;
-import club.szuai.signin.bean.Location;
-import club.szuai.signin.bean.Student;
-import club.szuai.signin.bean.Teacher;
-import club.szuai.signin.dbmapper.ClassMapper;
-import club.szuai.signin.dbmapper.LocationMapper;
-import club.szuai.signin.dbmapper.StudentMapper;
-import club.szuai.signin.dbmapper.TeacherMapper;
-import club.szuai.signin.service.ClassService;
+import club.szuai.signin.bean.*;
+import club.szuai.signin.dbmapper.*;
+import club.szuai.signin.service.CommonService;
+import club.szuai.signin.utils.DateUtil;
+import club.szuai.signin.utils.OAUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +17,17 @@ import java.util.List;
 import java.util.Map;
 
 @Service(value = "classService")
-public class ClassServiceImpl implements ClassService {
+public class CommonServiceImpl implements CommonService {
+    private final static Logger logger = LoggerFactory.getLogger(CommonServiceImpl.class);
 
     @Autowired
     private ClassMapper classMapper;
 
     @Autowired
     private LocationMapper locationMapper;
+
+    @Autowired
+    private SignInMapper signInMapper;
 
     @Autowired
     private StudentMapper studentMapper;
@@ -83,13 +86,13 @@ public class ClassServiceImpl implements ClassService {
                 idList.add(student_id);
                 nameList.add(studentMapper.selectByPrimaryKey(Integer.parseInt(student_id)).getName());
             }
-            result.put("error",0);
+            result.put("error", 0);
         } catch (Exception e) {
             e.printStackTrace();
-            result.put("error",1);
+            result.put("error", 1);
         }
-        result.put("idList",idList);
-        result.put("nameList",nameList);
+        result.put("idList", idList);
+        result.put("nameList", nameList);
         return result;
     }
 
@@ -100,30 +103,66 @@ public class ClassServiceImpl implements ClassService {
             Class course = classMapper.selectByPrimaryKey(class_id);
             String address = course.getAddress();
             Location location = locationMapper.selectByBuilding(address.split(",")[0]);
-            result.put("lat",location.getLat());
-            result.put("lng",location.getLng());
-            result.put("error",0);
+            result.put("lat", location.getLat());
+            result.put("lng", location.getLng());
+            result.put("error", 0);
         } catch (Exception e) {
             e.printStackTrace();
-            result.put("error",1);
+            result.put("error", 1);
         }
         return result;
     }
 
     @Override
     public List<String> getSignInList(int class_id) {
-        List<String> signInList = new ArrayList<>();
+        List<String> nameList = new ArrayList<>();
+        int weekStartTime = (int) (DateUtil.getWeekBeginTimestamp(System.currentTimeMillis()) / 1000);
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("classId", class_id);
+            params.put("weekStartTime", weekStartTime);
 
-        return null;
+            List<SignIn> signInList = signInMapper.selectByClassIdAndTime(params);
+            if (signInList.size() == 1) {
+                for (String student_id : signInList.get(0).getSigninIds().split(",")) {
+                    nameList.add(studentMapper.selectByPrimaryKey(Integer.parseInt(student_id)).getName());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return nameList;
     }
 
     @Override
-    public void updateSignInList(int class_id,int student_id) {
-        List<String> signInList = new ArrayList<>();
+    public void updateSignInList(int class_id, int student_id) {
+        int week = OAUtil.getWeekOfSemester();
+        int weekStartTime = (int) (DateUtil.getWeekBeginTimestamp(System.currentTimeMillis()) / 1000);
+        try {
+            SignIn signIn;
+            Map<String, Object> params = new HashMap<>();
+            params.put("classId", class_id);
+            params.put("weekStartTime", weekStartTime);
 
-
-
-
+            List<SignIn> signInList = signInMapper.selectByClassIdAndTime(params);
+            if (signInList.size() == 1) {
+                signIn = signInList.get(0);
+                String signinIds = signIn.getSigninIds();
+                //确保不重复写入
+                if (!signinIds.contains(student_id + "")) {
+                    signIn.setSigninIds(signinIds + "," + student_id);
+                }
+            } else if (signInList.isEmpty()) {
+                SignIn newSignIn = new SignIn();
+                newSignIn.setClassId(class_id);
+                newSignIn.setWeekStartTime(weekStartTime);
+                newSignIn.setWeek(week);
+                newSignIn.setSigninIds(student_id + "");
+                signInMapper.insertAndGetId(newSignIn);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

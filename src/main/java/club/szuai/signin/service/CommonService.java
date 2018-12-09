@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-public interface ClassService {
+public interface CommonService {
 
     int addClass(Class classes);
 
@@ -23,5 +23,6 @@ public interface ClassService {
     List<String> getSignInList(int class_id);
 
     void updateSignInList(int class_id,int student_id);
+
 
 }

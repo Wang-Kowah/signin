@@ -25,13 +25,13 @@ DROP TABLE IF EXISTS `t_class_list`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `t_class_list` (
-  `class_id` int(11) NOT NULL COMMENT '课程ID',
+  `class_id` int(11) NOT NULL COMMENT '课程编号',
   `name` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '课程名称',
   `semester` int(6) NOT NULL COMMENT '所属学期：如201801',
   `size` int(11) NOT NULL COMMENT '班级人数',
   `teacher_id` int(11) NOT NULL COMMENT '老师教工号',
   `student_ids` text CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'csv格式的学生学号集合',
-  `address` varchar(45) COLLATE utf8_bin NOT NULL COMMENT '教室位置,格式:"教学楼","教室号"',
+  `address` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '教室位置,格式:"教学楼","教室号"',
   PRIMARY KEY (`class_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=DYNAMIC COMMENT='课程信息';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -56,10 +56,10 @@ DROP TABLE IF EXISTS `t_location_list`;
 CREATE TABLE `t_location_list` (
   `id` int(5) NOT NULL AUTO_INCREMENT COMMENT '自增ID',
   `campus` int(1) NOT NULL COMMENT '校区:0后海;1西丽',
-  `building` varchar(45) COLLATE utf8_bin NOT NULL COMMENT '教学楼名称',
+  `building` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '教学楼名称',
   `lat` decimal(10,7) NOT NULL COMMENT '纬度',
   `lng` decimal(10,7) NOT NULL COMMENT '经度',
-  `classroom` varchar(45) COLLATE utf8_bin DEFAULT NULL COMMENT '教室号',
+  `classroom` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '教室号',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='教学楼(教室)对应位置表';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -72,6 +72,33 @@ LOCK TABLES `t_location_list` WRITE;
 /*!40000 ALTER TABLE `t_location_list` DISABLE KEYS */;
 INSERT INTO `t_location_list` VALUES (1,0,'冬筑',22.5297370,113.9427817,NULL);
 /*!40000 ALTER TABLE `t_location_list` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `t_signin_list`
+--
+
+DROP TABLE IF EXISTS `t_signin_list`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `t_signin_list` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+  `class_id` int(11) NOT NULL COMMENT '课程编号',
+  `week_start_time` int(11) NOT NULL COMMENT '上课该周的周一零点时间戳',
+  `week` int(2) NOT NULL COMMENT '学期第几周',
+  `signin_ids` text COLLATE utf8_bin NOT NULL COMMENT 'csv格式的已签到学号列表',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='每堂课的签到情况';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `t_signin_list`
+--
+
+LOCK TABLES `t_signin_list` WRITE;
+/*!40000 ALTER TABLE `t_signin_list` DISABLE KEYS */;
+INSERT INTO `t_signin_list` VALUES (1,1,1543766400,15,'1');
+/*!40000 ALTER TABLE `t_signin_list` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -141,4 +168,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-12-09  0:57:58
+-- Dump completed on 2018-12-09  4:37:25

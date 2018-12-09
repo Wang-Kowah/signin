@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class FileUtils {
+public class FileUtil {
 
     /**
      * 读取文件内容
@@ -53,12 +53,17 @@ public class FileUtils {
     /**
      * 将内容写入文件
      */
-    public static void write(String filepath, String content) {
+    public static void write(String dirpath, String filename, String content) {
         try {
-            File file = new File(filepath);
+            File dir = new File(dirpath);
+            dir.mkdirs();
+            File file = new File(dirpath + File.separator + filename);
             file.createNewFile();
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(content);
+            for (String line:content.split("\n")){
+                writer.write(line);
+                writer.newLine();
+            }
             writer.flush();
             writer.close();
         } catch (Exception e) {
