@@ -42,7 +42,7 @@ CREATE TABLE `t_class_list` (
 
 LOCK TABLES `t_class_list` WRITE;
 /*!40000 ALTER TABLE `t_class_list` DISABLE KEYS */;
-INSERT INTO `t_class_list` VALUES (1,'课程名',201801,40,77777,'0,1','冬筑,653');
+INSERT INTO `t_class_list` VALUES (1502880001,'基于Web的编程',201801,45,147,'0,2016150011','理工楼L1,211');
 /*!40000 ALTER TABLE `t_class_list` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -54,14 +54,14 @@ DROP TABLE IF EXISTS `t_location_list`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `t_location_list` (
-  `id` int(5) NOT NULL AUTO_INCREMENT COMMENT '自增ID',
+  `id` int(3) NOT NULL COMMENT '自增ID',
   `campus` int(1) NOT NULL COMMENT '校区:0后海;1西丽',
   `building` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '教学楼名称',
   `lat` decimal(10,7) NOT NULL COMMENT '纬度',
   `lng` decimal(10,7) NOT NULL COMMENT '经度',
-  `classroom` varchar(45) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '教室号',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='教学楼(教室)对应位置表';
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `building_UNIQUE` (`building`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='教学楼(教室)对应位置表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -70,7 +70,7 @@ CREATE TABLE `t_location_list` (
 
 LOCK TABLES `t_location_list` WRITE;
 /*!40000 ALTER TABLE `t_location_list` DISABLE KEYS */;
-INSERT INTO `t_location_list` VALUES (1,0,'冬筑',22.5297370,113.9427817,NULL);
+INSERT INTO `t_location_list` VALUES (1,0,'冬筑',22.5297370,113.9397600),(2,0,'理工楼L1',22.5280500,113.9394000),(3,0,'理工楼L2',22.5285200,113.9397600),(4,0,'理工楼L3',22.5283843,113.9403301),(5,0,'南区计算机大楼',22.5254806,113.9367950);
 /*!40000 ALTER TABLE `t_location_list` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -88,7 +88,7 @@ CREATE TABLE `t_signin_list` (
   `week` int(2) NOT NULL COMMENT '学期第几周',
   `signin_ids` text COLLATE utf8_bin NOT NULL COMMENT 'csv格式的已签到学号列表',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='每堂课的签到情况';
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='每堂课的签到情况';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -97,7 +97,7 @@ CREATE TABLE `t_signin_list` (
 
 LOCK TABLES `t_signin_list` WRITE;
 /*!40000 ALTER TABLE `t_signin_list` DISABLE KEYS */;
-INSERT INTO `t_signin_list` VALUES (1,1,1543766400,15,'1');
+INSERT INTO `t_signin_list` VALUES (1,1502880001,1543766400,15,'1,2016150011'),(3,1502880001,1544371200,15,'2016150011');
 /*!40000 ALTER TABLE `t_signin_list` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -128,7 +128,7 @@ CREATE TABLE `t_student_list` (
 
 LOCK TABLES `t_student_list` WRITE;
 /*!40000 ALTER TABLE `t_student_list` DISABLE KEYS */;
-INSERT INTO `t_student_list` VALUES (0,0,'test','123',2018128,'1,2,3',1,'666'),(1,180120,'kwoah','password',20181208,'1',1,'wx');
+INSERT INTO `t_student_list` VALUES (0,0,'test','123',2018128,'1,2,3',1,'666'),(2016150011,2016150011,'王国骅','10230056',1544374110,'1502880001',NULL,NULL);
 /*!40000 ALTER TABLE `t_student_list` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -155,7 +155,7 @@ CREATE TABLE `t_teacher_list` (
 
 LOCK TABLES `t_teacher_list` WRITE;
 /*!40000 ALTER TABLE `t_teacher_list` DISABLE KEYS */;
-INSERT INTO `t_teacher_list` VALUES (77777,'147老师','password',20181208,'1,2,3');
+INSERT INTO `t_teacher_list` VALUES (147,'于仕琪','password',20181208,'1502880001');
 /*!40000 ALTER TABLE `t_teacher_list` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -168,4 +168,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-12-09  4:37:25
+-- Dump completed on 2018-12-10  0:59:26

@@ -229,7 +229,6 @@ public class OAUtil {
      */
     public static int getIDByName(String name) {
         int id = 0;
-
         return id;
     }
 
@@ -309,5 +308,13 @@ public class OAUtil {
         }
         return result;
     }
+
+    /**
+     * 获取课表
+     */
+    public static String getSchedule(){
+        return "";
+    }
+
 
 }

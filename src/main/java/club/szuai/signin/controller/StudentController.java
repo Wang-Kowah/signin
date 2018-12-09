@@ -71,19 +71,21 @@ public class StudentController {
     /**
      * 登录模块
      */
-    @RequestMapping(value = "/auth")
+    @RequestMapping(value = "/auth", method = RequestMethod.POST)
     @ResponseBody
     public Map<String, Object> checkAuth(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> result = new HashMap<>();
         ErrorCode errorCode = ErrorCode.SUCCESS;
         String idStr = request.getParameter("id");
+        String stuIdStr = request.getParameter("stu_id");
         String pwStr = request.getParameter("pw");
-        int card_id;
+        int card_id, student_id;
         try {
-            if (StringUtils.isEmpty(idStr) || StringUtils.isEmpty(pwStr)) {
+            if (StringUtils.isEmpty(idStr) || StringUtils.isEmpty(stuIdStr) || StringUtils.isEmpty(pwStr)) {
                 throw new Exception();
             }
             card_id = Integer.parseInt(idStr);
+            student_id = Integer.parseInt(stuIdStr);
         } catch (Exception e) {
             logger.error("Parse error,id={},password={}", idStr, pwStr);
             errorCode = ErrorCode.PARAM_ERROR;
@@ -101,7 +103,16 @@ public class StudentController {
             //实例化httpclient
             OAUtil oaUtil = new OAUtil();
             if (oaUtil.loginOA(idStr, pwStr)) {
-                result.put("name", oaUtil.getName());
+                String name = oaUtil.getName();
+                result.put("name", name);
+                Student newStudent = new Student();
+                newStudent.setCardId(card_id);
+                newStudent.setPassword(pwStr);
+                newStudent.setCreateTime((int) (System.currentTimeMillis() / 1000));
+                newStudent.setName(name);
+                newStudent.setStudentId(student_id);
+                newStudent.setClassIds("");
+                studentMapper.insert(newStudent);
             } else {
                 errorCode = ErrorCode.LOGIN_FAIL;
             }
@@ -133,7 +144,7 @@ public class StudentController {
 
         List<Class> classes = commonService.getClasses(student_id);
         if (classes.isEmpty()) {
-            errorCode = ErrorCode.USER_IS_NOT_EXIST;
+            errorCode = ErrorCode.COURSE_IS_NOT_EXIST;
         } else {
             result.put("classes", classes);
         }
@@ -172,7 +183,8 @@ public class StudentController {
             return result;
         }
         //一分钟内请求否则拒绝
-        if (timestamp < DateUtil.getMinuteBeginTimestamp(System.currentTimeMillis())) {
+        long now = DateUtil.getMinuteBeginTimestamp(System.currentTimeMillis());
+        if (timestamp < now || timestamp > now) {
             errorCode = ErrorCode.TIME_OUT;
             result.put("retcode", errorCode.getCode());
             result.put("msg", errorCode.getMsg());
@@ -223,10 +235,12 @@ public class StudentController {
             result.put("msg", errorCode.getMsg());
             return result;
         }
+
         try {
             commonService.updateSignInList(class_id, student_id);
+            commonService.updateClassIds(class_id, student_id);
         } catch (Exception e) {
-            logger.error("Can't update sign_in status,student_id={},class_id={}", stuIdStr, classIdStr);
+            logger.error("Can't update signInList/classIds,student_id={},class_id={}", stuIdStr, classIdStr);
             errorCode = ErrorCode.SYSTEM_ERROR;
         }
         result.put("retcode", errorCode.getCode());

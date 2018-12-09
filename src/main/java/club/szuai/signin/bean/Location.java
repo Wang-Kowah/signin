@@ -1,7 +1,5 @@
 package club.szuai.signin.bean;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.math.BigDecimal;
 
 public class Location {
@@ -14,9 +12,6 @@ public class Location {
     private BigDecimal lat;
 
     private BigDecimal lng;
-
-    @JsonIgnore
-    private String classroom;
 
     public Integer getId() {
         return id;
@@ -56,13 +51,5 @@ public class Location {
 
     public void setLng(BigDecimal lng) {
         this.lng = lng;
-    }
-
-    public String getClassroom() {
-        return classroom;
-    }
-
-    public void setClassroom(String classroom) {
-        this.classroom = classroom == null ? null : classroom.trim();
     }
 }

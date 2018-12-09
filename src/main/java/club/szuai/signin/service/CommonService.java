@@ -24,5 +24,6 @@ public interface CommonService {
 
     void updateSignInList(int class_id,int student_id);
 
+    void updateClassIds(int class_id, int student_id);
 
 }

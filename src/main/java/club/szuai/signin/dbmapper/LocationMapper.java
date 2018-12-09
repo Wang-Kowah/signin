@@ -16,4 +16,5 @@ public interface LocationMapper {
     int updateByPrimaryKey(Location record);
 
     Location selectByBuilding(String building);
+
 }

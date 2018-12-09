@@ -150,7 +150,12 @@ public class CommonServiceImpl implements CommonService {
                 String signinIds = signIn.getSigninIds();
                 //确保不重复写入
                 if (!signinIds.contains(student_id + "")) {
-                    signIn.setSigninIds(signinIds + "," + student_id);
+                    if (signinIds.trim().equals("")) {
+                        signIn.setSigninIds(student_id + "");
+                    } else {
+                        signIn.setSigninIds(signinIds + "," + student_id);
+                    }
+                    signInMapper.updateByPrimaryKey(signIn);
                 }
             } else if (signInList.isEmpty()) {
                 SignIn newSignIn = new SignIn();
@@ -165,5 +170,23 @@ public class CommonServiceImpl implements CommonService {
         }
     }
 
+    @Override
+    public void updateClassIds(int class_id, int student_id) {
+        try {
+            Student student = studentMapper.selectByPrimaryKey(student_id);
+            String classIds = student.getClassIds();
+            //确保不重复写入
+            if (!classIds.contains(class_id + "")) {
+                if (classIds.trim().equals("")) {
+                    student.setClassIds(class_id + "");
+                } else {
+                    student.setClassIds(classIds + "," + class_id);
+                }
+                studentMapper.updateByPrimaryKey(student);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

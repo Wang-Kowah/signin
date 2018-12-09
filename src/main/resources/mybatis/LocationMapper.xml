@@ -7,10 +7,9 @@
     <result column="building" property="building" jdbcType="VARCHAR" />
     <result column="lat" property="lat" jdbcType="DECIMAL" />
     <result column="lng" property="lng" jdbcType="DECIMAL" />
-    <result column="classroom" property="classroom" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, campus, building, lat, lng, classroom
+    id, campus, building, lat, lng
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -24,11 +23,9 @@
   </delete>
   <insert id="insert" parameterType="club.szuai.signin.bean.Location" >
     insert into t_location_list (id, campus, building, 
-      lat, lng, classroom
-      )
+      lat, lng)
     values (#{id,jdbcType=INTEGER}, #{campus,jdbcType=INTEGER}, #{building,jdbcType=VARCHAR}, 
-      #{lat,jdbcType=DECIMAL}, #{lng,jdbcType=DECIMAL}, #{classroom,jdbcType=VARCHAR}
-      )
+      #{lat,jdbcType=DECIMAL}, #{lng,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="club.szuai.signin.bean.Location" >
     insert into t_location_list
@@ -48,9 +45,6 @@
       <if test="lng != null" >
         lng,
       </if>
-      <if test="classroom != null" >
-        classroom,
-      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -67,9 +61,6 @@
       </if>
       <if test="lng != null" >
         #{lng,jdbcType=DECIMAL},
-      </if>
-      <if test="classroom != null" >
-        #{classroom,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -88,9 +79,6 @@
       <if test="lng != null" >
         lng = #{lng,jdbcType=DECIMAL},
       </if>
-      <if test="classroom != null" >
-        classroom = #{classroom,jdbcType=VARCHAR},
-      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -99,8 +87,7 @@
     set campus = #{campus,jdbcType=INTEGER},
       building = #{building,jdbcType=VARCHAR},
       lat = #{lat,jdbcType=DECIMAL},
-      lng = #{lng,jdbcType=DECIMAL},
-      classroom = #{classroom,jdbcType=VARCHAR}
+      lng = #{lng,jdbcType=DECIMAL}
     where id = #{id,jdbcType=INTEGER}
   </update>
   <select id="selectByBuilding" resultMap="BaseResultMap" parameterType="java.lang.String" >
