@@ -28,3 +28,6 @@ spring:
 mybatis:
   mapper-locations: classpath:mybatis/*.xml       # 对应mapper映射xml文件的所在路径
   type-aliases-package: club.szuai.signin.bean    # 对应实体类的路径
+
+system-params:
+  imageUri: C:\Users\Kowah\Desktop\PDF\pic

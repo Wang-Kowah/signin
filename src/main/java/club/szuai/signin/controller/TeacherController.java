@@ -4,6 +4,7 @@ import club.szuai.signin.bean.Class;
 import club.szuai.signin.bean.SignIn;
 import club.szuai.signin.bean.Teacher;
 import club.szuai.signin.bean.enums.ErrorCode;
+import club.szuai.signin.config.SystemParams;
 import club.szuai.signin.dbmapper.SignInMapper;
 import club.szuai.signin.dbmapper.TeacherMapper;
 import club.szuai.signin.service.CommonService;
@@ -39,6 +40,9 @@ public class TeacherController {
 
     @Autowired
     private SignInMapper signInMapper;
+
+    @Autowired
+    private SystemParams systemParams;
 
     @Autowired
     private TeacherMapper teacherMapper;
@@ -192,7 +196,7 @@ public class TeacherController {
             long timestamp = DateUtil.getMinuteBeginTimestamp(System.currentTimeMillis()) / 1000;
             String url = "https://szuai.club/signin/stu/signin?class_id=" + class_id + "valid=" + timestamp;
 //            System.out.println(url);
-            QRCodeUtil.generateToStream(800, 800, url, "png", stream);
+            QRCodeUtil.generateToStream(800, 800, url, "png", stream, systemParams.getImageUri());
 
             stream.close();
         } catch (Exception e) {
