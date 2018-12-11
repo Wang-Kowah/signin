@@ -9,7 +9,9 @@ import club.szuai.signin.dbmapper.SignInMapper;
 import club.szuai.signin.dbmapper.TeacherMapper;
 import club.szuai.signin.service.CommonService;
 import club.szuai.signin.utils.DateUtil;
+import club.szuai.signin.utils.OAUtil;
 import club.szuai.signin.utils.QRCodeUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -47,9 +50,61 @@ public class TeacherController {
     @Autowired
     private TeacherMapper teacherMapper;
 
-    @RequestMapping("/admin")
-    public String html() {
+    @RequestMapping("/Admin")
+    public String admin() {
         return "/admin.html";
+    }
+
+
+    @RequestMapping(value = "/adminLogin", method = RequestMethod.POST)
+    @ResponseBody
+    public ModelAndView adminLogin(HttpServletRequest request, HttpServletResponse response) {
+        Map<String, Object> result = new HashMap<>();
+        ErrorCode errorCode = ErrorCode.SUCCESS;
+        String idStr = request.getParameter("username");
+        String pwStr = request.getParameter("password");
+        String hiddenInput = request.getParameter("authuser");
+        int teacher_id = 0;
+        try {
+            if (StringUtils.isEmpty(idStr) || StringUtils.isEmpty(pwStr)|| !hiddenInput.equals("teacher")) {
+                throw new Exception();
+            }
+            teacher_id = Integer.parseInt(idStr);
+        } catch (Exception e) {
+            logger.error("Parse error,id={},password={}", idStr, pwStr);
+            errorCode = ErrorCode.PARAM_ERROR;
+            result.put("retcode", errorCode.getCode());
+            result.put("msg", errorCode.getMsg());
+//            return result;
+            return new ModelAndView("redirect:/login?error=1");
+        }
+
+        Teacher teacher = teacherMapper.selectByPrimaryKey(teacher_id);
+        if (teacher != null) {
+            result.put("name", teacher.getName());
+        } else {
+            //数据库中找不到该老师时通过OA来验证身份
+            logger.info("Card_id:{} not found,trying to login OA", teacher_id);
+            //实例化httpclient
+            OAUtil oaUtil = new OAUtil();
+            if (oaUtil.loginOA(idStr, pwStr)) {
+                String name = oaUtil.getName();
+                result.put("name", name);
+                Teacher newTeacher = new Teacher();
+                newTeacher.setTeacherId(teacher_id);
+                newTeacher.setPassword(pwStr);
+                newTeacher.setCreateTime((int) (System.currentTimeMillis() / 1000));
+                newTeacher.setName(name);
+                newTeacher.setClassIds("");
+                teacherMapper.insert(newTeacher);
+            } else {
+                errorCode = ErrorCode.LOGIN_FAIL;
+            }
+        }
+        result.put("retcode", errorCode.getCode());
+        result.put("msg", errorCode.getMsg());
+        return  new ModelAndView("redirect:http://localhost:8181/signin/tch/Admin");
+//        return result;
     }
 
     @RequestMapping(value = "/getList")

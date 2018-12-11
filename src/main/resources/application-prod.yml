@@ -4,25 +4,26 @@ server:
 spring:
   datasource:
     name: main
-    url: jdbc:mysql://127.0.0.1:3306/db_signin?useUnicode=true&characterEncoding=UTF-8 #&useSSL=false
+    url: jdbc:mysql://127.0.0.1:3306/db_signin?useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: root
     password: 123456
     # 使用druid数据源
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    filters: stat
-    maxActive: 20
-    initialSize: 1
-    maxWait: 60000
-    minIdle: 1
-    timeBetweenEvictionRunsMillis: 60000
-    minEvictableIdleTimeMillis: 300000
-    validationQuery: select 'x'
-    testWhileIdle: true
-    testOnBorrow: false
-    testOnReturn: false
-    poolPreparedStatements: true
-    maxOpenPreparedStatements: 20
+    druid:
+      initial-size: 1
+      filters: stat
+      max-active: 20
+      max-wait: 60000
+      min-idle: 1
+      validation-query: select 'x'
+      max-open-prepared-statements: 20
+      pool-prepared-statements: true
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      min-evictable-idle-time-millis: 300000
+      time-between-connect-error-millis: 60000
 
 # 该配置节点为独立的节点，放在spring的节点下会导致配置无法被识别
 mybatis:

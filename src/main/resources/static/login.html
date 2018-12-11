@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>登录</title>
+</head>
+<link rel="stylesheet" type="text/css" href="css/login.css">
+<script src="js/jquery.min.js"></script>
+<script>
+    window.onload=function(){
+        var url = location.href;
+        if(url.includes('#')){
+            document.getElementById("allError").setAttribute("style", "");    
+        } else {
+            document.getElementById("allError").setAttribute("style", "display:none");
+        }
+    }
+    function checkRequired(obj, msgId) {
+        if (obj.value == "") {
+            document.getElementById(msgId).setAttribute("style", "");
+            return false;
+        } else {
+            document.getElementById(msgId).setAttribute("style", "display:none");
+            return true;
+        }
+    }
+</script>
+
+<body>
+    <div class="login">
+        <div class="logo"></div>
+        <form id="loginForm" class="login-form" role="form" action="/signin/tch/adminLogin" method="post">
+            <div class="form-item">
+                <input id="username" name="username" type="text" autocomplete="on" placeholder="教工号" value="">
+                <span id="usernameError" style="display:none;" class="tip">请输入正确的教工号</span>
+            </div>
+            <div class="form-item">
+                <input id="password" name="password" type="password" autocomplete="off" placeholder="密码" value="">
+                <span id="passwordError" style="display:none;" class="tip">请输入密码</span>
+                <span id="allError" style="display:none;" class="tip">您提供的用户名或者密码有误</span>
+            </div>
+            <!-- 实际使用中似乎并不会用到免登录 -->
+            <!-- <div class="checkbox">
+                <p><input type="checkbox" name="rememberMe" id="rememberMe" />&nbsp;一周内免登录</p>
+            </div> -->
+            <div class="form-item">
+                <button id="submit" type="submit">登 录</button>
+            </div>
+            <input type="hidden" name="authuser" value="teacher">
+        </form>
+        <div class="reg-bar">
+            <span>欢迎使用本系统，请先登录</span>
+        </div>
+    </div>
+</body>
+
+
+<script type="text/javascript">
+    var loginForm = document.getElementById("loginForm");
+    loginForm.onsubmit = doLogin;
+    function doLogin() {
+        var username = document.getElementById("username");
+        var password = document.getElementById("password");
+        if (!checkRequired(username, "usernameError")) {
+            username.focus();
+            return false;
+        }
+        if (!checkRequired(password, "passwordError")) {
+            password.focus();
+            return false;
+        }
+        checkRequired(username, "usernameError");
+        checkRequired(password, "passwordError");
+        // if (username.value == "123456" && password.value == "654321") {
+        //     document.getElementById("allError").setAttribute("style", "display:none");
+        // } else {
+        //     document.getElementById("allError").setAttribute("style", "");
+        //     return false;
+        // }
+        return true;
+    }
+</script>
+
+</html>
