@@ -45,6 +45,9 @@ public class StudentController {
     @Autowired
     private StudentMapper studentMapper;
 
+    /**
+     * 获取学生列表
+     */
     @RequestMapping(value = "/getList")
     @ResponseBody
     public Map<String, Object> getStudentList(HttpServletRequest request, HttpServletResponse response) {
@@ -77,15 +80,15 @@ public class StudentController {
         Map<String, Object> result = new HashMap<>();
         ErrorCode errorCode = ErrorCode.SUCCESS;
         String idStr = request.getParameter("id");
-        String stuIdStr = request.getParameter("stu_id");
+//        String stuIdStr = request.getParameter("stu_id");           //可由OA爬取
         String pwStr = request.getParameter("pw");
         int card_id, student_id;
         try {
-            if (StringUtils.isEmpty(idStr) || StringUtils.isEmpty(stuIdStr) || StringUtils.isEmpty(pwStr)) {
+            if (StringUtils.isEmpty(idStr) || StringUtils.isEmpty(pwStr)) {
                 throw new Exception();
             }
             card_id = Integer.parseInt(idStr);
-            student_id = Integer.parseInt(stuIdStr);
+//            student_id = Integer.parseInt(stuIdStr);
         } catch (Exception e) {
             logger.error("Parse error,id={},password={}", idStr, pwStr);
             errorCode = ErrorCode.PARAM_ERROR;
@@ -96,7 +99,11 @@ public class StudentController {
 
         Student student = studentMapper.selectByCardId(card_id);
         if (student != null) {
-            result.put("name", student.getName());
+            if(student.getPassword().equals(pwStr)) {
+                result.put("name", student.getName());
+            } else {
+                errorCode = ErrorCode.LOGIN_FAIL;
+            }
         } else {
             //数据库中找不到该学生时通过OA来验证身份
             logger.debug("Card_id:{} not found,trying to login OA", card_id);
@@ -110,7 +117,7 @@ public class StudentController {
                 newStudent.setPassword(pwStr);
                 newStudent.setCreateTime((int) (System.currentTimeMillis() / 1000));
                 newStudent.setName(name);
-                newStudent.setStudentId(student_id);
+//                newStudent.setStudentId(student_id);
                 newStudent.setClassIds("");
                 studentMapper.insert(newStudent);
             } else {

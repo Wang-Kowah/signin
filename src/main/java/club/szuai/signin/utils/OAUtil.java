@@ -134,7 +134,7 @@ public class OAUtil {
      * @param end     结束学号
      * @param pause   爬取间隔(建议不低于5)
      */
-    public static void getIDPhotos(String dirPath, int start, int end, int pause) {
+    public static void getPhotos(String dirPath, int start, int end, int pause) {
         try {
             httpClient = getHttpClient();
             for (int id = start; id <= end; id++) {
@@ -225,14 +225,6 @@ public class OAUtil {
     }
 
     /**
-     * 根据姓名获取学号
-     */
-    public static int getIDByName(String name) {
-        int id = 0;
-        return id;
-    }
-
-    /**
      * 获取专业名单
      */
     public static JSONObject getIDByCollegeAndMajor(String dirPath) {
@@ -307,6 +299,15 @@ public class OAUtil {
             e.printStackTrace();
         }
         return result;
+    }
+
+    /**
+     * 获取学号
+     */
+    public static int getStuId() {
+
+        int id = 0;
+        return id;
     }
 
     /**

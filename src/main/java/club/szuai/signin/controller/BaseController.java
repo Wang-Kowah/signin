@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping(value = "/")
 public class BaseController {
 
+    /**
+     * 登录页面
+     */
     @RequestMapping("/login")
     public String login(@RequestParam(value = "error" ,defaultValue = "0") Integer error) {
         if (error == 1){

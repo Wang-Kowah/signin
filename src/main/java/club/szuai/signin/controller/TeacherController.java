@@ -24,9 +24,8 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import javax.servlet.http.HttpSession;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Controller
 @RequestMapping(value = "/tch")
@@ -50,12 +49,21 @@ public class TeacherController {
     @Autowired
     private TeacherMapper teacherMapper;
 
+    /**
+     * 管理页面
+     */
     @RequestMapping("/Admin")
-    public String admin() {
-        return "/admin.html";
+    public String admin(HttpSession session) {
+        if (session.getAttribute("name") != null) {
+            return "/admin.html";
+        } else {
+            return "redirect:/login.html";
+        }
     }
 
-
+    /**
+     * 后台登录
+     */
     @RequestMapping(value = "/adminLogin", method = RequestMethod.POST)
     @ResponseBody
     public ModelAndView adminLogin(HttpServletRequest request, HttpServletResponse response) {
@@ -64,9 +72,9 @@ public class TeacherController {
         String idStr = request.getParameter("username");
         String pwStr = request.getParameter("password");
         String hiddenInput = request.getParameter("authuser");
-        int teacher_id = 0;
+        int teacher_id;
         try {
-            if (StringUtils.isEmpty(idStr) || StringUtils.isEmpty(pwStr)|| !hiddenInput.equals("teacher")) {
+            if (StringUtils.isEmpty(idStr) || StringUtils.isEmpty(pwStr) || !hiddenInput.equals("teacher")) {
                 throw new Exception();
             }
             teacher_id = Integer.parseInt(idStr);
@@ -75,21 +83,24 @@ public class TeacherController {
             errorCode = ErrorCode.PARAM_ERROR;
             result.put("retcode", errorCode.getCode());
             result.put("msg", errorCode.getMsg());
-//            return result;
-            return new ModelAndView("redirect:/login?error=1");
+            return new ModelAndView("redirect:/login.html#");
         }
 
+        String name;
         Teacher teacher = teacherMapper.selectByPrimaryKey(teacher_id);
         if (teacher != null) {
-            result.put("name", teacher.getName());
+            if (teacher.getPassword().equals(pwStr)) {
+                name = teacher.getName();
+            } else {
+                return new ModelAndView("redirect:/login.html#");
+            }
         } else {
             //数据库中找不到该老师时通过OA来验证身份
             logger.info("Card_id:{} not found,trying to login OA", teacher_id);
             //实例化httpclient
             OAUtil oaUtil = new OAUtil();
             if (oaUtil.loginOA(idStr, pwStr)) {
-                String name = oaUtil.getName();
-                result.put("name", name);
+                name = oaUtil.getName();
                 Teacher newTeacher = new Teacher();
                 newTeacher.setTeacherId(teacher_id);
                 newTeacher.setPassword(pwStr);
@@ -98,15 +109,20 @@ public class TeacherController {
                 newTeacher.setClassIds("");
                 teacherMapper.insert(newTeacher);
             } else {
-                errorCode = ErrorCode.LOGIN_FAIL;
+                return new ModelAndView("redirect:/login.html#");
             }
         }
-        result.put("retcode", errorCode.getCode());
-        result.put("msg", errorCode.getMsg());
-        return  new ModelAndView("redirect:http://localhost:8181/signin/tch/Admin");
-//        return result;
+        if (errorCode.equals(ErrorCode.SUCCESS)) {
+            HttpSession session = request.getSession();
+            session.setMaxInactiveInterval(10 * 60);
+            session.setAttribute("name", name);
+        }
+        return new ModelAndView("redirect:/tch/Admin");
     }
 
+    /**
+     * 获取教师列表
+     */
     @RequestMapping(value = "/getList")
     @ResponseBody
     public Map<String, Object> getTeacherList(HttpServletRequest request, HttpServletResponse response) {
@@ -249,7 +265,7 @@ public class TeacherController {
             ServletOutputStream stream = response.getOutputStream();
 
             long timestamp = DateUtil.getMinuteBeginTimestamp(System.currentTimeMillis()) / 1000;
-            String url = "https://szuai.club/signin/stu/signin?class_id=" + class_id + "valid=" + timestamp;
+            String url = "class_id=" + class_id + "&valid=" + timestamp;
 //            System.out.println(url);
             QRCodeUtil.generateToStream(800, 800, url, "png", stream, systemParams.getImageUri());
 
