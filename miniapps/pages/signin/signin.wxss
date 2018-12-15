@@ -1,1 +1,10 @@
 /* pages/login.wxss */
+.content{
+  margin-top: 150px;
+}
+
+.qrcode-btn {
+  background: #09bb07;
+  color: #fff;
+  margin-bottom: 20px;
+}

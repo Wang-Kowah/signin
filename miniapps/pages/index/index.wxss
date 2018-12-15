@@ -17,9 +17,62 @@
 }
 
 .usermotto {
-  margin-top: 200px;
+  margin-top: 80px;
+  font-size: 20px;
 }
 
-.section{
-  width: 250px;
+.auth {
+  display: inline-flex;
+  width: 100%;
+  margin-bottom: 50px;
+  margin-top: 25px;
+}
+
+.sections{
+  padding-top: 2px;
+  width: 100%;
+  padding-left: 5%;
+  padding-right: 5%;
+}
+
+.section {
+  height: 40px;
+  width: 100%;
+  border-style: solid;
+  border-color: #b2b2b2;
+  border-bottom-width: 1rpx;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
+.section1 {
+  height: 40px;
+  width: 100%;
+  padding-top: 10px;
+}
+
+.section__title {
+  display: inline-block;
+  vertical-align:middle;
+  width: 60px;
+  font-size: 18px;
+}
+
+.input {
+  display: inline-block;
+  vertical-align:middle;
+  width: 180px;
+}
+
+.button {
+  background: #09bb07;
+  color: #fff;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.tips {
+  font-size: 10px;
+  color: #b2b2b2;
 }

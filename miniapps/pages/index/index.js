@@ -11,9 +11,9 @@ Page({
   },
   //事件处理函数
   bindViewTap: function() {
-    wx.navigateTo({
-      url: '../signin/signin'
-    })
+    // wx.navigateTo({
+    //   url: '../signin/signin'
+    // })
   },
   onLoad: function() {
     if (app.globalData.userInfo) {
@@ -42,13 +42,27 @@ Page({
         }
       })
     }
+    wx.getLocation({
+      type: 'wgs84',
+      success(res) {
+        console.log(res);
+        wx.setStorage({
+          key: 'lat',
+          data: res.latitude,
+        })
+        wx.setStorage({
+          key: 'lng',
+          data: res.longitude,
+        })
+      }
+    })
   },
   formSubmit(e) {
     console.log('form发生了submit事件，携带数据为：', e.detail.value)
 
     if (e.detail.value.id.length == 0) {
       wx.showToast({
-        title: '卡号不得为空!',
+        title: '学号不得为空!',
         icon: 'loading',
         duration: 1500
       })
@@ -68,10 +82,10 @@ Page({
       wx.request({
         url: 'https://szuai.club:8888/signin/stu/auth',
         data: {
-          id: e.detail.value.id,
+          stu_id: e.detail.value.id,
           pw: e.detail.value.pw
         },
-        method: 'POST', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
+        method: 'POST', 
         header: {
           "Content-Type": "application/x-www-form-urlencoded"
         }, // 设置请求的 header
@@ -79,7 +93,7 @@ Page({
           console.log(res);
           wx.showToast({
             title: '登录成功',
-            icon: 'success',
+            icon:"none",
             duration: 2000
           })
           wx.setStorage({
@@ -95,7 +109,7 @@ Page({
           console.log(res);
           wx.showToast({
             title: res.data.msg,
-            icon: 'fail',
+            icon: 'none',
             duration: 2000
           })
           // fail

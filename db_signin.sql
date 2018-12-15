@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `db_signin` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_bin */;
-USE `db_signin`;
 -- MySQL dump 10.13  Distrib 8.0.12, for Win64 (x86_64)
 --
 -- Host: localhost    Database: db_signin
@@ -42,7 +40,7 @@ CREATE TABLE `t_class_list` (
 
 LOCK TABLES `t_class_list` WRITE;
 /*!40000 ALTER TABLE `t_class_list` DISABLE KEYS */;
-INSERT INTO `t_class_list` VALUES (1502880001,'基于Web的编程',201801,45,147,'0,2016150011','理工楼L1,211');
+INSERT INTO `t_class_list` VALUES (1500030004,'Java程序设计',201801,22,147,'0','理工楼L1,401'),(1502880001,'基于Web的编程',201801,45,147,'0,2016150011','理工楼L1,211');
 /*!40000 ALTER TABLE `t_class_list` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -128,7 +126,7 @@ CREATE TABLE `t_student_list` (
 
 LOCK TABLES `t_student_list` WRITE;
 /*!40000 ALTER TABLE `t_student_list` DISABLE KEYS */;
-INSERT INTO `t_student_list` VALUES (0,0,'test','123',2018128,'1,2,3',1,'666'),(2016150011,2016150011,'王国骅','10230056',1544374110,'1502880001',NULL,NULL);
+INSERT INTO `t_student_list` VALUES (0,0,'test','123',2018128,'1,2,3',1,'666'),(2016150011,2016150011,'王国骅','password',1544374110,'1502880001',NULL,NULL);
 /*!40000 ALTER TABLE `t_student_list` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -155,7 +153,7 @@ CREATE TABLE `t_teacher_list` (
 
 LOCK TABLES `t_teacher_list` WRITE;
 /*!40000 ALTER TABLE `t_teacher_list` DISABLE KEYS */;
-INSERT INTO `t_teacher_list` VALUES (147,'于仕琪','password',20181208,'1502880001');
+INSERT INTO `t_teacher_list` VALUES (147,'于仕琪','password',20181208,'1502880001,1500030004'),(180120,'王国骅','password',1544535519,'');
 /*!40000 ALTER TABLE `t_teacher_list` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -168,4 +166,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-12-10  0:59:26
+-- Dump completed on 2018-12-15 20:44:17

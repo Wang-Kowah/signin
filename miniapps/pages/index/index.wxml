@@ -11,14 +11,17 @@
     <text class="user-motto">{{motto}}</text>
   </view>
   <view class='auth'>
-    <form bindsubmit="formSubmit">
+    <form class='sections' bindsubmit="formSubmit">
       <view class="section">
-        <view class="section__title1">卡号</view>
-        <input name='id' type='text' placeholder='校园卡号' />
-        <view class="section__title2">密码</view>
-        <input name='pw' type='password' placeholder='统一认证密码' />
+        <span class="section__title">学号</span>
+        <input class='input' name='id' type='text' placeholder='学号' />
       </view>
-      <button form-type="submit">登录</button>
+      <view class="section1">
+        <span class="section__title">密码</span>
+        <input class='input' name='pw' type='password' placeholder='统一认证密码' />
+      </view>
+      <button class='button' form-type="submit">登录</button>
     </form>
   </view>
+  <view class="tips">该信息仅用于身份验证</view>
 </view>

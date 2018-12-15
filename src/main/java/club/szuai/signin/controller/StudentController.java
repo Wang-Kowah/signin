@@ -79,25 +79,26 @@ public class StudentController {
     public Map<String, Object> checkAuth(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> result = new HashMap<>();
         ErrorCode errorCode = ErrorCode.SUCCESS;
-        String idStr = request.getParameter("id");
-//        String stuIdStr = request.getParameter("stu_id");           //可由OA爬取
+//        String idStr = request.getParameter("id");                //无需用到卡号
+        String stuIdStr = request.getParameter("stu_id");
         String pwStr = request.getParameter("pw");
         int card_id, student_id;
         try {
-            if (StringUtils.isEmpty(idStr) || StringUtils.isEmpty(pwStr)) {
+            if (StringUtils.isEmpty(stuIdStr) || StringUtils.isEmpty(pwStr)) {
                 throw new Exception();
             }
-            card_id = Integer.parseInt(idStr);
-//            student_id = Integer.parseInt(stuIdStr);
+//            card_id = Integer.parseInt(idStr);
+            student_id = Integer.parseInt(stuIdStr);
         } catch (Exception e) {
-            logger.error("Parse error,id={},password={}", idStr, pwStr);
+            logger.error("Parse error,student_id={},password={}", stuIdStr, pwStr);
             errorCode = ErrorCode.PARAM_ERROR;
             result.put("retcode", errorCode.getCode());
             result.put("msg", errorCode.getMsg());
             return result;
         }
 
-        Student student = studentMapper.selectByCardId(card_id);
+//        Student student = studentMapper.selectByCardId(card_id);
+        Student student = studentMapper.selectByPrimaryKey(student_id);
         if (student != null) {
             if(student.getPassword().equals(pwStr)) {
                 result.put("name", student.getName());
@@ -106,18 +107,18 @@ public class StudentController {
             }
         } else {
             //数据库中找不到该学生时通过OA来验证身份
-            logger.debug("Card_id:{} not found,trying to login OA", card_id);
+            logger.debug("Student_id:{} not found,trying to login OA", student_id);
             //实例化httpclient
             OAUtil oaUtil = new OAUtil();
-            if (oaUtil.loginOA(idStr, pwStr)) {
+            if (oaUtil.loginOA(stuIdStr, pwStr)) {
                 String name = oaUtil.getName();
                 result.put("name", name);
                 Student newStudent = new Student();
-                newStudent.setCardId(card_id);
+//                newStudent.setCardId(card_id);
                 newStudent.setPassword(pwStr);
                 newStudent.setCreateTime((int) (System.currentTimeMillis() / 1000));
                 newStudent.setName(name);
-//                newStudent.setStudentId(student_id);
+                newStudent.setStudentId(student_id);
                 newStudent.setClassIds("");
                 studentMapper.insert(newStudent);
             } else {
@@ -168,7 +169,7 @@ public class StudentController {
     public Map<String, Object> signIn(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> result = new HashMap<>();
         ErrorCode errorCode = ErrorCode.SUCCESS;
-        String stuIdStr = request.getParameter("stu_id");
+//        String stuIdStr = request.getParameter("stu_id");
         String classIdStr = request.getParameter("class_id");
         String latStr = request.getParameter("lat");
         String lngStr = request.getParameter("lng");
@@ -177,22 +178,23 @@ public class StudentController {
         long timestamp;
         BigDecimal lat, lng;
         try {
-            student_id = Integer.parseInt(stuIdStr);
+//            student_id = Integer.parseInt(stuIdStr);
             class_id = Integer.parseInt(classIdStr);
             lat = new BigDecimal(latStr);
             lng = new BigDecimal(lngStr);
             timestamp = Long.parseLong(timeStr);
         } catch (Exception e) {
-            logger.error("Parse error,student_id={},class_id={},lat={},lng={},timestamp={}", stuIdStr, classIdStr, latStr, lngStr, timeStr);
+//            logger.error("Parse error,student_id={},class_id={},lat={},lng={},timestamp={}", stuIdStr, classIdStr, latStr, lngStr, timeStr);
+            logger.error("Parse error,class_id={},lat={},lng={},timestamp={}",classIdStr, latStr, lngStr, timeStr);
             errorCode = ErrorCode.PARAM_ERROR;
             result.put("retcode", errorCode.getCode());
             result.put("msg", errorCode.getMsg());
             return result;
         }
         //一分钟内请求否则拒绝
-        long now = DateUtil.getMinuteBeginTimestamp(System.currentTimeMillis());
+        long now = DateUtil.getMinuteBeginTimestamp(System.currentTimeMillis()) / 1000;
         if (timestamp < now || timestamp > now) {
-            errorCode = ErrorCode.TIME_OUT;
+            errorCode = ErrorCode.QRCODE_IS_NOT_VALID;
             result.put("retcode", errorCode.getCode());
             result.put("msg", errorCode.getMsg());
             return result;

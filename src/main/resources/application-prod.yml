@@ -1,5 +1,9 @@
 server:
   port: 8888
+  ssl:
+    key-store: /root/signin/SHA256withRSA_szuai.club.pfx
+    key-store-password: 1234
+    key-store-type: PKCS12
 
 spring:
   datasource:

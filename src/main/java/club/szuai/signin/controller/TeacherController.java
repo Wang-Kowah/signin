@@ -25,6 +25,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.net.HttpCookie;
 import java.util.*;
 
 @Controller
@@ -54,7 +55,7 @@ public class TeacherController {
      */
     @RequestMapping("/Admin")
     public String admin(HttpSession session) {
-        if (session.getAttribute("name") != null) {
+        if (session.getAttribute("name") != null || session.getAttribute("id") != null) {
             return "/admin.html";
         } else {
             return "redirect:/login.html";
@@ -116,6 +117,7 @@ public class TeacherController {
             HttpSession session = request.getSession();
             session.setMaxInactiveInterval(10 * 60);
             session.setAttribute("name", name);
+            session.setAttribute("id", teacher_id);
         }
         return new ModelAndView("redirect:/tch/Admin");
     }
@@ -262,12 +264,18 @@ public class TeacherController {
         }
 
         try {
+            //允许跨域访问
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            response.setHeader("Access-Control-Allow-Methods", "GET");
+            response.setHeader("'Access-Control-Allow-Headers", "x-requested-with,content-type");
+
             ServletOutputStream stream = response.getOutputStream();
 
             long timestamp = DateUtil.getMinuteBeginTimestamp(System.currentTimeMillis()) / 1000;
-            String url = "class_id=" + class_id + "&valid=" + timestamp;
+            String url = class_id + "&" + timestamp;
 //            System.out.println(url);
-            QRCodeUtil.generateToStream(800, 800, url, "png", stream, systemParams.getImageUri());
+
+            QRCodeUtil.generateToStream(600, 600, url, "png", stream, systemParams.getImageUri());
 
             stream.close();
         } catch (Exception e) {

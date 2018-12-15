@@ -2,7 +2,8 @@
   "pages": [
     "pages/index/index",
     "pages/logs/logs",
-    "pages/signin/signin"
+    "pages/signin/signin",
+    "pages/seccess/seccess"
   ],
   "window": {
     "backgroundTextStyle": "light",

@@ -1,32 +1,15 @@
 var app = getApp()
 Page({
-  data: {
-    motto: 'Hello World',
-    userInfo: {}
-  },
-  //事件处理函数
-  // bindViewTap: function() {
-  //   wx.navigateTo({
-  //   url: '../logs/logs'
-  //   })
-  // },
+  data: {},
   //调用扫码功能
   callQRcode: function() {
     wx.scanCode({
       success: (res) => {
-        wx.getLocation({
-          type: 'wgs84',
-          success(res) {
-            const lat = res.latitude
-            const lng = res.longitude
-          }
-        })
         var data = res.result;
-        var arr = data.split('&');
-        if (data.indexOf(str) > -1) {
-          arr = data.split(str);
+        if (data.indexOf('&') > -1) {
+          var arr = data.split('&');
           var api = "https://szuai.club:8888/signin/stu";
-          var stu_id;
+          var stu_id, latitude, longitude;
 
           wx.getStorage({
             key: 'stu_id',
@@ -34,21 +17,35 @@ Page({
               stu_id = res.data;
             },
           })
+          wx.getStorage({
+            key: 'lat',
+            success: function(res) {
+              latitude = res.data;
+            },
+          })
+          wx.getStorage({
+            key: 'lng',
+            success: function(res) {
+              longitude = res.data;
+            },
+          })
           wx.request({
             url: api + "/signin",
             method: "POST",
             data: {
-              stu_id: stu_id,
               class_id: arr[0],
               valid: arr[1],
-              lat: lat,
-              lng: lng
+              lat: latitude,
+              lng: longitude
+            },
+            header: {
+              "Content-Type": "application/x-www-form-urlencoded"
             },
             success: function(res) {
-              if (res.data.succ) {
+              if (res.data.retcode==0) {
                 wx.showToast({
                   title: "签到成功",
-                  image: "../images/user.png",
+                  icon: "none",
                   duration: 3000,
                   mask: true
                 });
@@ -56,19 +53,22 @@ Page({
                   url: api + "/updateStatus",
                   method: "POST",
                   data: {
-                    stu_id: s,
+                    stu_id: stu_id,
                     class_id: arr[0],
                   },
+                  header: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                  },
                   success: function(res) {
-                    if (res.data.succ) {
+                    if (res.data.retcode == 0) {
                       wx.navigateTo({
-                        url: '../logs/logs'
+                        url: '../seccess/seccess'
                       })
                     } else {
                       wx.showToast({
                         title: res.data.msg,
-                        image: "../images/password.png",
-                        duration: 3000,
+                        icon: "none",
+                        duration: 5000,
                         mask: true
                       });
                     }
@@ -77,19 +77,18 @@ Page({
               } else {
                 wx.showToast({
                   title: res.data.msg,
-                  image: "../images/password.png",
-                  duration: 3000,
+                  icon: "none",
+                  duration: 5000,
                   mask: true
                 });
               }
             }
           })
         }
-
       }
     });
   },
   onLoad: function() {
-    console.log('onLoad')
+    console.log('Signin onLoad')
   }
 })
