@@ -264,10 +264,10 @@ public class TeacherController {
         }
 
         try {
-            //允许跨域访问
-            response.setHeader("Access-Control-Allow-Origin", "*");
-            response.setHeader("Access-Control-Allow-Methods", "GET");
-            response.setHeader("'Access-Control-Allow-Headers", "x-requested-with,content-type");
+            //本地调试时需要允许跨域访问
+//            response.setHeader("Access-Control-Allow-Origin", "*");
+//            response.setHeader("Access-Control-Allow-Methods", "GET");
+//            response.setHeader("'Access-Control-Allow-Headers", "x-requested-with,content-type");
 
             ServletOutputStream stream = response.getOutputStream();
 
