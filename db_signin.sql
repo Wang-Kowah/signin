@@ -1,3 +1,5 @@
+CREATE DATABASE  IF NOT EXISTS `db_signin` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_bin */;
+USE `db_signin`;
 -- MySQL dump 10.13  Distrib 8.0.12, for Win64 (x86_64)
 --
 -- Host: localhost    Database: db_signin
@@ -126,7 +128,7 @@ CREATE TABLE `t_student_list` (
 
 LOCK TABLES `t_student_list` WRITE;
 /*!40000 ALTER TABLE `t_student_list` DISABLE KEYS */;
-INSERT INTO `t_student_list` VALUES (0,0,'test','123',2018128,'1,2,3',1,'666'),(2016150011,2016150011,'王国骅','password',1544374110,'1502880001',NULL,NULL);
+INSERT INTO `t_student_list` VALUES (0,0,'test','123',2018128,'1,1502880001',1,'666'),(2016150011,2016150011,'王国骅','password',1544374110,'1502880001',NULL,NULL);
 /*!40000 ALTER TABLE `t_student_list` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -166,4 +168,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-12-15 20:44:17
+-- Dump completed on 2018-12-20 23:55:26

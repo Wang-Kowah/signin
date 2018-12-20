@@ -85,24 +85,32 @@ Page({
           stu_id: e.detail.value.id,
           pw: e.detail.value.pw
         },
-        method: 'POST', 
+        method: 'POST',
         header: {
           "Content-Type": "application/x-www-form-urlencoded"
         }, // 设置请求的 header
         success: function(res) {
           console.log(res);
-          wx.showToast({
-            title: '登录成功',
-            icon:"none",
-            duration: 2000
-          })
-          wx.setStorage({
-            key: 'stu_id',
-            data: e.detail.value.id,
-          })
-          wx.navigateTo({
-            url: '../signin/signin'
-          })
+          if (res.data.retcode == 0) {
+            wx.showToast({
+              title: '登录成功',
+              icon: "none",
+              duration: 2000
+            })
+            wx.setStorage({
+              key: 'stu_id',
+              data: e.detail.value.id,
+            })
+            wx.navigateTo({
+              url: '../signin/signin'
+            })
+          }else{
+            wx.showToast({
+              title: '学号或密码错误',
+              icon: "none",
+              duration: 2000
+            })
+          }
           // success
         },
         fail: function(res) {
