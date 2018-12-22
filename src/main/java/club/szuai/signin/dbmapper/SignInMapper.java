@@ -22,7 +22,7 @@ public interface SignInMapper {
 
     int updateByPrimaryKey(SignIn record);
 
-    List<SignIn> selectByClassIdAndTime(Map<String,Object> params);
+    List<SignIn> selectByClassIdAndTime(Map<String, Object> params);
 
-    List<SignIn> selectByClassId(Map<String,Object> params);
+    List<SignIn> selectByClassId(Map<String, Object> params);
 }

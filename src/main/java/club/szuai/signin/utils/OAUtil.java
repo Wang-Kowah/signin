@@ -313,7 +313,7 @@ public class OAUtil {
     /**
      * 获取课表
      */
-    public static String getSchedule(){
+    public static String getSchedule() {
         return "";
     }
 

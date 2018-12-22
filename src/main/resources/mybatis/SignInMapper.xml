@@ -1,101 +1,101 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="club.szuai.signin.dbmapper.SignInMapper" >
-  <resultMap id="BaseResultMap" type="club.szuai.signin.bean.SignIn" >
-    <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="class_id" property="classId" jdbcType="INTEGER" />
-    <result column="week_start_time" property="weekStartTime" jdbcType="INTEGER" />
-    <result column="week" property="week" jdbcType="INTEGER" />
-  </resultMap>
-  <resultMap id="ResultMapWithBLOBs" type="club.szuai.signin.bean.SignIn" extends="BaseResultMap" >
-    <result column="signin_ids" property="signinIds" jdbcType="LONGVARCHAR" />
-  </resultMap>
-  <sql id="Base_Column_List" >
+<mapper namespace="club.szuai.signin.dbmapper.SignInMapper">
+    <resultMap id="BaseResultMap" type="club.szuai.signin.bean.SignIn">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="class_id" property="classId" jdbcType="INTEGER"/>
+        <result column="week_start_time" property="weekStartTime" jdbcType="INTEGER"/>
+        <result column="week" property="week" jdbcType="INTEGER"/>
+    </resultMap>
+    <resultMap id="ResultMapWithBLOBs" type="club.szuai.signin.bean.SignIn" extends="BaseResultMap">
+        <result column="signin_ids" property="signinIds" jdbcType="LONGVARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
     id, class_id, week_start_time, week
   </sql>
-  <sql id="Blob_Column_List" >
+    <sql id="Blob_Column_List">
     signin_ids
   </sql>
-  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
-    select 
-    <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
-    from t_signin_list
-    where id = #{id,jdbcType=INTEGER}
-  </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from t_signin_list
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from t_signin_list
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="club.szuai.signin.bean.SignIn" >
+    <insert id="insert" parameterType="club.szuai.signin.bean.SignIn">
     insert into t_signin_list (id, class_id, week_start_time, 
       week, signin_ids)
     values (#{id,jdbcType=INTEGER}, #{classId,jdbcType=INTEGER}, #{weekStartTime,jdbcType=INTEGER}, 
       #{week,jdbcType=INTEGER}, #{signinIds,jdbcType=LONGVARCHAR})
   </insert>
-  <insert id="insertAndGetId" parameterType="club.szuai.signin.bean.SignIn" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertAndGetId" parameterType="club.szuai.signin.bean.SignIn" useGeneratedKeys="true" keyProperty="id">
     insert into t_signin_list (id, class_id, week_start_time,
       week, signin_ids)
     values (#{id,jdbcType=INTEGER}, #{classId,jdbcType=INTEGER}, #{weekStartTime,jdbcType=INTEGER},
       #{week,jdbcType=INTEGER}, #{signinIds,jdbcType=LONGVARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="club.szuai.signin.bean.SignIn" >
-    insert into t_signin_list
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        id,
-      </if>
-      <if test="classId != null" >
-        class_id,
-      </if>
-      <if test="weekStartTime != null" >
-        week_start_time,
-      </if>
-      <if test="week != null" >
-        week,
-      </if>
-      <if test="signinIds != null" >
-        signin_ids,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        #{id,jdbcType=INTEGER},
-      </if>
-      <if test="classId != null" >
-        #{classId,jdbcType=INTEGER},
-      </if>
-      <if test="weekStartTime != null" >
-        #{weekStartTime,jdbcType=INTEGER},
-      </if>
-      <if test="week != null" >
-        #{week,jdbcType=INTEGER},
-      </if>
-      <if test="signinIds != null" >
-        #{signinIds,jdbcType=LONGVARCHAR},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="club.szuai.signin.bean.SignIn" >
-    update t_signin_list
-    <set >
-      <if test="classId != null" >
-        class_id = #{classId,jdbcType=INTEGER},
-      </if>
-      <if test="weekStartTime != null" >
-        week_start_time = #{weekStartTime,jdbcType=INTEGER},
-      </if>
-      <if test="week != null" >
-        week = #{week,jdbcType=INTEGER},
-      </if>
-      <if test="signinIds != null" >
-        signin_ids = #{signinIds,jdbcType=LONGVARCHAR},
-      </if>
-    </set>
-    where id = #{id,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="club.szuai.signin.bean.SignIn" >
+    <insert id="insertSelective" parameterType="club.szuai.signin.bean.SignIn">
+        insert into t_signin_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="classId != null">
+                class_id,
+            </if>
+            <if test="weekStartTime != null">
+                week_start_time,
+            </if>
+            <if test="week != null">
+                week,
+            </if>
+            <if test="signinIds != null">
+                signin_ids,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="classId != null">
+                #{classId,jdbcType=INTEGER},
+            </if>
+            <if test="weekStartTime != null">
+                #{weekStartTime,jdbcType=INTEGER},
+            </if>
+            <if test="week != null">
+                #{week,jdbcType=INTEGER},
+            </if>
+            <if test="signinIds != null">
+                #{signinIds,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="club.szuai.signin.bean.SignIn">
+        update t_signin_list
+        <set>
+            <if test="classId != null">
+                class_id = #{classId,jdbcType=INTEGER},
+            </if>
+            <if test="weekStartTime != null">
+                week_start_time = #{weekStartTime,jdbcType=INTEGER},
+            </if>
+            <if test="week != null">
+                week = #{week,jdbcType=INTEGER},
+            </if>
+            <if test="signinIds != null">
+                signin_ids = #{signinIds,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKeyWithBLOBs" parameterType="club.szuai.signin.bean.SignIn">
     update t_signin_list
     set class_id = #{classId,jdbcType=INTEGER},
       week_start_time = #{weekStartTime,jdbcType=INTEGER},
@@ -103,27 +103,27 @@
       signin_ids = #{signinIds,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="club.szuai.signin.bean.SignIn" >
+    <update id="updateByPrimaryKey" parameterType="club.szuai.signin.bean.SignIn">
     update t_signin_list
     set class_id = #{classId,jdbcType=INTEGER},
       week_start_time = #{weekStartTime,jdbcType=INTEGER},
       week = #{week,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <select id="selectByClassIdAndTime" resultMap="ResultMapWithBLOBs">
-    select
-    <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
-    from t_signin_list
-    where class_id = #{classId} and week_start_time = #{weekStartTime}
-  </select>
-  <select id="selectByClassId" resultMap="ResultMapWithBLOBs">
-    select
-    <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
-    from t_signin_list
-    where class_id = #{classId}
-  </select>
+    <select id="selectByClassIdAndTime" resultMap="ResultMapWithBLOBs">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from t_signin_list
+        where class_id = #{classId} and week_start_time = #{weekStartTime}
+    </select>
+    <select id="selectByClassId" resultMap="ResultMapWithBLOBs">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from t_signin_list
+        where class_id = #{classId}
+    </select>
 </mapper>

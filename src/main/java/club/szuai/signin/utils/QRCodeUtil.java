@@ -1,14 +1,10 @@
 package club.szuai.signin.utils;
 
-import club.szuai.signin.config.SystemParams;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-//import com.google.zxing.client.j2se.MatrixToImageWriter;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -19,10 +15,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 
+//import com.google.zxing.client.j2se.MatrixToImageWriter;
+
 public class QRCodeUtil {
 
     public static void main(String[] args) {
-        generateToFile(800, 800, "https://szuai.club", "png", "C:\\Users\\Kowah\\Desktop\\QRCode.png","C:\\Users\\Kowah\\Desktop\\PDF\\pic");
+        generateToFile(800, 800, "https://szuai.club", "png", "C:\\Users\\Kowah\\Desktop\\QRCode.png", "C:\\Users\\Kowah\\Desktop\\PDF\\pic");
     }
 
     /**
@@ -33,7 +31,7 @@ public class QRCodeUtil {
      * @param content 内容
      * @param format  图片格式:jpg/png
      */
-    public static void generateToStream(int width, int height, String content, String format, OutputStream stream,String logoDir) {
+    public static void generateToStream(int width, int height, String content, String format, OutputStream stream, String logoDir) {
         HashMap<EncodeHintType, Object> hits = new HashMap<>();
         hits.put(EncodeHintType.CHARACTER_SET, "UTF-8");                    //编码
         hits.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);  //纠错等级，纠错等级越高存储信息越少
@@ -41,7 +39,7 @@ public class QRCodeUtil {
 
         try {
             BitMatrix bitMatrix = new MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, width, height, hits);
-            MatrixToImageWriter.writeToStream(bitMatrix, format, stream,logoDir);
+            MatrixToImageWriter.writeToStream(bitMatrix, format, stream, logoDir);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -56,7 +54,7 @@ public class QRCodeUtil {
      * @param format   图片格式:jpg/png
      * @param filePath 输出路径
      */
-    public static void generateToFile(int width, int height, String content, String format, String filePath,String logoDir) {
+    public static void generateToFile(int width, int height, String content, String format, String filePath, String logoDir) {
         HashMap<EncodeHintType, Object> hits = new HashMap<>();
         hits.put(EncodeHintType.CHARACTER_SET, "UTF-8");                    //编码
         hits.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);  //纠错等级，纠错等级越高存储信息越少
@@ -65,7 +63,7 @@ public class QRCodeUtil {
         try {
             BitMatrix bitMatrix = new MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, width, height, hits);
             File file = new File(filePath);
-            MatrixToImageWriter.writeToFile(bitMatrix, format, file,logoDir);
+            MatrixToImageWriter.writeToFile(bitMatrix, format, file, logoDir);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -95,11 +93,11 @@ class MatrixToImageWriter {
     }
 
     //输出到文件
-    public static void writeToFile(BitMatrix matrix, String format, File file,String logoDir) throws IOException {
+    public static void writeToFile(BitMatrix matrix, String format, File file, String logoDir) throws IOException {
         BufferedImage image = toBufferedImage(matrix);
         //设置logo图标
         LogoConfig logoConfig = new LogoConfig();
-        image = logoConfig.LogoMatrix(image,logoDir);
+        image = logoConfig.LogoMatrix(image, logoDir);
 
         if (!ImageIO.write(image, format, file)) {
             throw new IOException("Could not write an image of format " + format + " to " + file);
@@ -107,11 +105,11 @@ class MatrixToImageWriter {
     }
 
     //输出到流
-    public static void writeToStream(BitMatrix matrix, String format, OutputStream stream,String logoDir) throws IOException {
+    public static void writeToStream(BitMatrix matrix, String format, OutputStream stream, String logoDir) throws IOException {
         BufferedImage image = toBufferedImage(matrix);
         //设置logo图标
         LogoConfig logoConfig = new LogoConfig();
-        image = logoConfig.LogoMatrix(image,logoDir);
+        image = logoConfig.LogoMatrix(image, logoDir);
 
         if (!ImageIO.write(image, format, stream)) {
             throw new IOException("Could not write an image of format " + format);
@@ -132,14 +130,14 @@ class LogoConfig {
      * @param matrixImage 源二维码图片
      * @return 返回带有logo的二维码图片
      */
-    public BufferedImage LogoMatrix(BufferedImage matrixImage,String logoDir) throws IOException {
+    public BufferedImage LogoMatrix(BufferedImage matrixImage, String logoDir) throws IOException {
         //读取二维码图片，并构建绘图对象
         Graphics2D g2 = matrixImage.createGraphics();
         int matrixWidth = matrixImage.getWidth();
         int matrixHeigh = matrixImage.getHeight();
 
         //读取Logo图片
-        BufferedImage logo = ImageIO.read(new File(logoDir+File.separator+"wx.jpg"));
+        BufferedImage logo = ImageIO.read(new File(logoDir + File.separator + "wx.jpg"));
 
         //开始绘制图片
         g2.drawImage(logo, matrixWidth / 5 * 2, matrixHeigh / 5 * 2, matrixWidth / 5, matrixHeigh / 5, null);//绘制

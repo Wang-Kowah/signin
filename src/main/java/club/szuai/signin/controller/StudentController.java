@@ -35,9 +35,9 @@ public class StudentController {
     private static final int DEFUALT_UNIT_COUNT_PAGES = 10;
 
     /**
-     * 默认签到范围为50m
+     * 默认签到范围为250m
      */
-    private static final int DEFUALT_SIGN_IN_DISTANCE = 50;
+    private static final int DEFUALT_SIGN_IN_DISTANCE = 250;
 
     @Autowired
     private CommonService commonService;
@@ -100,7 +100,7 @@ public class StudentController {
 //        Student student = studentMapper.selectByCardId(card_id);
         Student student = studentMapper.selectByPrimaryKey(student_id);
         if (student != null) {
-            if(student.getPassword().equals(pwStr)) {
+            if (student.getPassword().equals(pwStr)) {
                 result.put("name", student.getName());
             } else {
                 errorCode = ErrorCode.LOGIN_FAIL;
@@ -185,7 +185,7 @@ public class StudentController {
             timestamp = Long.parseLong(timeStr);
         } catch (Exception e) {
 //            logger.error("Parse error,student_id={},class_id={},lat={},lng={},timestamp={}", stuIdStr, classIdStr, latStr, lngStr, timeStr);
-            logger.error("Parse error,class_id={},lat={},lng={},timestamp={}",classIdStr, latStr, lngStr, timeStr);
+            logger.error("Parse error,class_id={},lat={},lng={},timestamp={}", classIdStr, latStr, lngStr, timeStr);
             errorCode = ErrorCode.PARAM_ERROR;
             result.put("retcode", errorCode.getCode());
             result.put("msg", errorCode.getMsg());
@@ -193,7 +193,7 @@ public class StudentController {
         }
         //一分钟内请求否则拒绝
         long now = DateUtil.getMinuteBeginTimestamp(System.currentTimeMillis()) / 1000;
-        if (timestamp < now || timestamp > now) {
+        if (timestamp != now) {
             errorCode = ErrorCode.QRCODE_IS_NOT_VALID;
             result.put("retcode", errorCode.getCode());
             result.put("msg", errorCode.getMsg());
@@ -246,6 +246,11 @@ public class StudentController {
         }
 
         try {
+            //本地调试时需要允许跨域访问
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            response.setHeader("Access-Control-Allow-Methods", "GET");
+            response.setHeader("'Access-Control-Allow-Headers", "x-requested-with,content-type");
+
             commonService.updateSignInList(class_id, student_id);
             commonService.updateClassIds(class_id, student_id);
         } catch (Exception e) {

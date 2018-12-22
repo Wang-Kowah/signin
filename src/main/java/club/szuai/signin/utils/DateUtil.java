@@ -121,6 +121,7 @@ public class DateUtil {
         // 获取当天零点的时间戳
         return c.getTimeInMillis();
     }
+
     /**
      * 获取当前分钟的开始时间戳
      */

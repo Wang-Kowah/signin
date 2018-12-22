@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="club.szuai.signin.dbmapper.StudentMapper" >
-  <resultMap id="BaseResultMap" type="club.szuai.signin.bean.Student" >
-    <id column="student_id" property="studentId" jdbcType="INTEGER" />
-    <id column="card_id" property="cardId" jdbcType="INTEGER" />
-    <result column="name" property="name" jdbcType="VARCHAR" />
-    <result column="password" property="password" jdbcType="VARCHAR" />
-    <result column="create_time" property="createTime" jdbcType="INTEGER" />
-    <result column="class_ids" property="classIds" jdbcType="VARCHAR" />
-    <result column="sex" property="sex" jdbcType="INTEGER" />
-    <result column="wechat" property="wechat" jdbcType="VARCHAR" />
-  </resultMap>
-  <sql id="Base_Column_List" >
+<mapper namespace="club.szuai.signin.dbmapper.StudentMapper">
+    <resultMap id="BaseResultMap" type="club.szuai.signin.bean.Student">
+        <id column="student_id" property="studentId" jdbcType="INTEGER"/>
+        <id column="card_id" property="cardId" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="INTEGER"/>
+        <result column="class_ids" property="classIds" jdbcType="VARCHAR"/>
+        <result column="sex" property="sex" jdbcType="INTEGER"/>
+        <result column="wechat" property="wechat" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
     student_id,card_id, name, password, create_time, class_ids, sex, wechat
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select 
-    <include refid="Base_Column_List" />
-    from t_student_list
-    where student_id = #{studentId,jdbcType=INTEGER}
-  </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from t_student_list
+        where student_id = #{studentId,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from t_student_list
     where student_id = #{studentId,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="club.szuai.signin.bean.Student" >
+    <insert id="insert" parameterType="club.szuai.signin.bean.Student">
     insert into t_student_list (student_id,card_id, name, password,
       create_time, class_ids, sex, 
       wechat)
@@ -32,89 +32,89 @@
       #{createTime,jdbcType=INTEGER}, #{classIds,jdbcType=VARCHAR}, #{sex,jdbcType=INTEGER}, 
       #{wechat,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="club.szuai.signin.bean.Student" >
-    insert into t_student_list
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="studentId != null" >
-        student_id,
-      </if>
-      <if test="cardId != null" >
-        card_id,
-      </if>
-      <if test="name != null" >
-        name,
-      </if>
-      <if test="password != null" >
-        password,
-      </if>
-      <if test="createTime != null" >
-        create_time,
-      </if>
-      <if test="classIds != null" >
-        class_ids,
-      </if>
-      <if test="sex != null" >
-        sex,
-      </if>
-      <if test="wechat != null" >
-        wechat,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="studentId != null" >
-        #{studentId,jdbcType=INTEGER},
-      </if>
-      <if test="cardId != null" >
-        #{cardId,jdbcType=INTEGER},
-      </if>
-      <if test="name != null" >
-        #{name,jdbcType=VARCHAR},
-      </if>
-      <if test="password != null" >
-        #{password,jdbcType=VARCHAR},
-      </if>
-      <if test="createTime != null" >
-        #{createTime,jdbcType=INTEGER},
-      </if>
-      <if test="classIds != null" >
-        #{classIds,jdbcType=VARCHAR},
-      </if>
-      <if test="sex != null" >
-        #{sex,jdbcType=INTEGER},
-      </if>
-      <if test="wechat != null" >
-        #{wechat,jdbcType=VARCHAR},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="club.szuai.signin.bean.Student" >
-    update t_student_list
-    <set >
-      <if test="cardId != null" >
-        #{cardId,jdbcType=INTEGER},
-      </if>
-      <if test="name != null" >
-        name = #{name,jdbcType=VARCHAR},
-      </if>
-      <if test="password != null" >
-        password = #{password,jdbcType=VARCHAR},
-      </if>
-      <if test="createTime != null" >
-        create_time = #{createTime,jdbcType=INTEGER},
-      </if>
-      <if test="classIds != null" >
-        class_ids = #{classIds,jdbcType=VARCHAR},
-      </if>
-      <if test="sex != null" >
-        sex = #{sex,jdbcType=INTEGER},
-      </if>
-      <if test="wechat != null" >
-        wechat = #{wechat,jdbcType=VARCHAR},
-      </if>
-    </set>
-    where student_id = #{studentId,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="club.szuai.signin.bean.Student" >
+    <insert id="insertSelective" parameterType="club.szuai.signin.bean.Student">
+        insert into t_student_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="studentId != null">
+                student_id,
+            </if>
+            <if test="cardId != null">
+                card_id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="password != null">
+                password,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="classIds != null">
+                class_ids,
+            </if>
+            <if test="sex != null">
+                sex,
+            </if>
+            <if test="wechat != null">
+                wechat,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="studentId != null">
+                #{studentId,jdbcType=INTEGER},
+            </if>
+            <if test="cardId != null">
+                #{cardId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=INTEGER},
+            </if>
+            <if test="classIds != null">
+                #{classIds,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                #{sex,jdbcType=INTEGER},
+            </if>
+            <if test="wechat != null">
+                #{wechat,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="club.szuai.signin.bean.Student">
+        update t_student_list
+        <set>
+            <if test="cardId != null">
+                #{cardId,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="password != null">
+                password = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=INTEGER},
+            </if>
+            <if test="classIds != null">
+                class_ids = #{classIds,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                sex = #{sex,jdbcType=INTEGER},
+            </if>
+            <if test="wechat != null">
+                wechat = #{wechat,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where student_id = #{studentId,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="club.szuai.signin.bean.Student">
     update t_student_list
     set
       card_id = #{cardId,jdbcType=INTEGER},
@@ -126,15 +126,15 @@
       wechat = #{wechat,jdbcType=VARCHAR}
     where student_id = #{studentId,jdbcType=INTEGER}
   </update>
-  <select id="getList" resultMap="BaseResultMap">
-    SELECT * FROM t_student_list
-    ORDER BY `student_id` DESC
-    <if test="null != limit">LIMIT #{limit}</if>
-  </select>
-  <select id="selectByCardId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
-    select
-    <include refid="Base_Column_List" />
-    from t_student_list
-    where card_id = #{cardId,jdbcType=INTEGER}
-  </select>
+    <select id="getList" resultMap="BaseResultMap">
+        SELECT * FROM t_student_list
+        ORDER BY `student_id` DESC
+        <if test="null != limit">LIMIT #{limit}</if>
+    </select>
+    <select id="selectByCardId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from t_student_list
+        where card_id = #{cardId,jdbcType=INTEGER}
+    </select>
 </mapper>

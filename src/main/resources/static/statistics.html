@@ -1,134 +1,143 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-          content="A layout example with a side menu that hides on mobile, just like the Pure website.">
+    <meta name="description" content="A layout example with a side menu that hides on mobile, just like the Pure website.">
     <title>签到情况</title>
 
-    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-"
-          crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-" crossorigin="anonymous">
     <link rel="stylesheet" href="../css/layouts/side-menu.css">
 </head>
+
 <body>
     <script src="../js/jquery.min.js"></script>
     <script src="../js/jquery.cookie.js"></script>
 
 
-<div id="layout">
+    <div id="layout">
+        <!-- Menu toggle -->
+        <a href="#menu" id="menuLink" class="menu-link">
+            <!-- Hamburger icon -->
+            <span></span>
+        </a>
 
-    <div id="menu">
-        <div class="pure-menu">
-            <a class="pure-menu-heading" href="">签到后台管理</a>
+        <div id="menu">
+            <div class="pure-menu">
+                <a class="pure-menu-heading" href="">签到后台管理</a>
 
-            <ul class="pure-menu-list">
-                <li class="pure-menu-item">
-                    <a href="manage" class="pure-menu-link">课程列表</a>
-                </li>
-                <li class="pure-menu-item menu-item-divided pure-menu-selected">
-                    <a href="" class="pure-menu-link">签到情况</a>
-                </li>
+                <ul class="pure-menu-list">
+                    <li class="pure-menu-item">
+                        <a href="manage" class="pure-menu-link">课程列表</a>
+                    </li>
+                    <li class="pure-menu-item menu-item-divided pure-menu-selected">
+                        <a href="" class="pure-menu-link">签到情况</a>
+                    </li>
 
-                <li class="pure-menu-item">
-                    <a href="contact" class="pure-menu-link">联系我们</a>
-                </li>
-            </ul>
+                    <li class="pure-menu-item">
+                        <a href="contact" class="pure-menu-link">联系我们</a>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
 
-    <div id="main">
-        <div class="header">
-            <h1>签到情况</h1>
-            <h2>如有学生签到失败可以手动签到</h2>
-        </div>
-
-        <div class="content">
-            <div id="table">
-                <table class="pure-table pure-table-bordered">
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>学号</th>
-                        <th>姓名</th>
-                        <th>签到情况</th>
-                    </tr>
-                    </thead>
-
-                    <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>2016150001</td>
-                        <td>学生1</td>
-                        <td>√</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>2016150002</td>
-                        <td>学生2</td>
-                        <td>×</td>
-                    </tr>
-                    </tbody>
-                </table>
+        <div id="main">
+            <div class="header">
+                <h1>签到情况</h1>
+                <h2>如有学生签到失败可以手动签到</h2>
             </div>
 
-            <form class="pure-form" action="/signin/stu/updateStauts" method="post">
-                <fieldset>
-                    <legend>手动签到</legend>
-                    <input name="stu_id" type="text" autocomplete="off" placeholder="需要手动签到的学号">
-                    <input name="class_id" id="hidden" type="hidden" value="">
-                    <button type="submit" class="pure-button pure-button-primary">登录</button>
-                </fieldset>
-            </form>
+            <div class="content">
+                <div id="table">
+                    <table class="pure-table pure-table-bordered">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>学号</th>
+                                <th>姓名</th>
+                                <th>签到情况</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
 
+                <form class="pure-form" id="form" action="" method="post">
+                    <fieldset>
+                        <legend>手动签到</legend>
+                        <input name="stu_id" id="stu_id" type="text" autocomplete="off" placeholder="需要手动签到的学号">
+                        <input name="class_id" type="hidden" value="">
+                        <button class="pure-button pure-button-primary">签到</button>
+                        <span style="display:none">&nbsp;&nbsp;手动签到成功！</span>
+                    </fieldset>
+                </form>
+
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    window.onload = getList();
-
-    function getList() {
+    <script>
         var classId = $.cookie('classId');
-        $("#hidden").attr("value",classId);
-
-        var template = "<tr><td>2</td><td>2016150002</td><td>学生2</td><td>×</td></tr>";
-
-        $.ajax({
-            url: "https://szuai.club:8888/signin/tch/nameList",
-            data: {"class_id": classId},
-            type: "GET",
-            dataType: "json",
-            success: function (data) {
-                console.log(data);
-                var content = "";
-                for (var i=0;i<data.idlist.length;i++) {
-                    content += "<tr><td>"+(i+1)+"</td><td>"+data.idlist[i]+"</td><td>"+data.namelist[i]+"</td><td id=\""+data.idlist[i]+"\">×</td></tr>";
-                }
-                $("tbody").html(content);
-                update();
-            }
+        window.onload = getList();
+        $("#form").submit(function() {
+            return false;   //阻止默认行为，提交表单
         });
-    }
 
-    function update(){
-        $.ajax({
-            url: "https://szuai.club:8888/signin/tch/history",
-            data: {"class_id": classId,"time":getTime()/1000},
-            type: "GET",
-            dataType: "json",
-            success: function (data) {
-                console.log(data);
-                var list = data.signinlist;
-                for (var i in list) {
-                    $("#"+i).html("√");
+        function getList() {
+            $.ajax({
+                url: "https://szuai.club:8888/signin/tch/nameList",
+                data: { "class_id": classId },
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    var content = "";
+                    for (var i = 0; i < data.idlist.length; i++) {
+                        content += "<tr><td>" + (i + 1) + "</td><td>" + data.idlist[i] + "</td><td>" + data.namelist[i] + "</td><td id=\"" + data.idlist[i] + "\">×</td></tr>";
+                    }
+                    $("tbody").html(content);
+                    update();
+                    window.setInterval(() => {
+                        update();
+                    }, 1000 * 10);
                 }
-            }
-        });
-    }
+            });
+        }
 
-</script>
-<script src="../js/ui.js"></script>
+        function update() {
+            $.ajax({
+                url: "https://szuai.club:8888/signin/tch/history",
+                data: { "class_id": classId, "time": new Date().getTime() },
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    for (var i in data.signinlist) {
+                        $("#" + data.signinlist[i]).html("√");
+                    }
+                }
+            });
+        }
+
+        $("#form fieldset button").on('click', function () {
+            $.ajax({
+                url: "https://szuai.club:8888/signin/stu/updateStatus",
+                data: { "class_id": classId, "stu_id": $("#stu_id").val() },
+                type: "POST",
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    $("#form fieldset span").attr("style","");
+                    $("#stu_id").val("");
+                }
+            });
+        });
+
+    </script>
+    <script src="../js/ui.js"></script>
 
 </body>
+
 </html>

@@ -5,9 +5,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 @Controller
 @RequestMapping(value = "/")
 public class BaseController {
@@ -16,8 +13,8 @@ public class BaseController {
      * 登录页面
      */
     @RequestMapping("/login")
-    public String login(@RequestParam(value = "error" ,defaultValue = "0") Integer error) {
-        if (error == 1){
+    public String login(@RequestParam(value = "error", defaultValue = "0") Integer error) {
+        if (error == 1) {
             return "/login.html#";
         }
         return "/login.html";
@@ -28,7 +25,7 @@ public class BaseController {
      */
     @RequestMapping("/dashboard/{page}")
     public String dashboard(@PathVariable("page") String page) {
-        return "/"+page+".html";
+            return "/" + page + ".html";
     }
 
 }

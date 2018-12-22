@@ -90,5 +90,26 @@ Page({
   },
   onLoad: function() {
     console.log('Signin onLoad')
+    wx.getStorage({
+      key: 'lat',
+      success: function (res) {
+        if(res.data==null){
+          wx.getLocation({
+            type: 'wgs84',
+            success(res) {
+              console.log(res);
+              wx.setStorage({
+                key: 'lat',
+                data: res.latitude,
+              })
+              wx.setStorage({
+                key: 'lng',
+                data: res.longitude,
+              })
+            }
+          })
+        }
+      },
+    })
   }
 })

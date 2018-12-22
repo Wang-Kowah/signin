@@ -60,7 +60,7 @@ public class FileUtil {
             File file = new File(dirpath + File.separator + filename);
             file.createNewFile();
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            for (String line:content.split("\n")){
+            for (String line : content.split("\n")) {
                 writer.write(line);
                 writer.newLine();
             }

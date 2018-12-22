@@ -42,7 +42,7 @@ CREATE TABLE `t_class_list` (
 
 LOCK TABLES `t_class_list` WRITE;
 /*!40000 ALTER TABLE `t_class_list` DISABLE KEYS */;
-INSERT INTO `t_class_list` VALUES (1500030004,'Java程序设计',201801,22,147,'0','理工楼L1,401'),(1502880001,'基于Web的编程',201801,45,147,'0,2016150011','理工楼L1,211');
+INSERT INTO `t_class_list` VALUES (1500030004,'Java程序设计',201801,22,147,'0,1,2','理工楼L1,401'),(1502880001,'基于Web的编程',201801,45,147,'0,1,2,2016150011','理工楼L1,211');
 /*!40000 ALTER TABLE `t_class_list` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -86,9 +86,9 @@ CREATE TABLE `t_signin_list` (
   `class_id` int(11) NOT NULL COMMENT '课程编号',
   `week_start_time` int(11) NOT NULL COMMENT '上课该周的周一零点时间戳',
   `week` int(2) NOT NULL COMMENT '学期第几周',
-  `signin_ids` text COLLATE utf8_bin NOT NULL COMMENT 'csv格式的已签到学号列表',
+  `signin_ids` text CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'csv格式的已签到学号列表',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='每堂课的签到情况';
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='每堂课的签到情况';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -97,7 +97,7 @@ CREATE TABLE `t_signin_list` (
 
 LOCK TABLES `t_signin_list` WRITE;
 /*!40000 ALTER TABLE `t_signin_list` DISABLE KEYS */;
-INSERT INTO `t_signin_list` VALUES (1,1502880001,1543766400,15,'1,2016150011'),(3,1502880001,1544371200,15,'2016150011');
+INSERT INTO `t_signin_list` VALUES (1,1502880001,1543766400,14,'1,2016150011'),(3,1502880001,1544371200,15,'2016150011'),(4,1502880001,1544976000,16,'0');
 /*!40000 ALTER TABLE `t_signin_list` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -110,7 +110,7 @@ DROP TABLE IF EXISTS `t_student_list`;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `t_student_list` (
   `student_id` int(11) NOT NULL COMMENT '学号',
-  `card_id` int(6) NOT NULL COMMENT '校园卡号',
+  `card_id` int(6) DEFAULT '0' COMMENT '校园卡号',
   `name` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT '名称',
   `password` varchar(40) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `create_time` int(11) NOT NULL,
@@ -128,7 +128,7 @@ CREATE TABLE `t_student_list` (
 
 LOCK TABLES `t_student_list` WRITE;
 /*!40000 ALTER TABLE `t_student_list` DISABLE KEYS */;
-INSERT INTO `t_student_list` VALUES (0,0,'test','123',2018128,'1,1502880001',1,'666'),(2016150011,2016150011,'王国骅','password',1544374110,'1502880001',NULL,NULL);
+INSERT INTO `t_student_list` VALUES (0,0,'test','123',20181208,'1,2,3',1,'666'),(1,1,'学生1','123',20181222,'1,2,3',NULL,NULL),(2,2,'学生2','123',20181222,'1,2,3',NULL,NULL),(2016150011,2016150011,'王国骅','password',1544374110,'1502880001',NULL,NULL),(2016150012,180403,'梁仕钢','password',1545320942,'',NULL,NULL);
 /*!40000 ALTER TABLE `t_student_list` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -168,4 +168,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-12-20 23:55:26
+-- Dump completed on 2018-12-22 23:07:18

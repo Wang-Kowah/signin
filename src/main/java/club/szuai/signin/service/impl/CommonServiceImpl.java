@@ -136,7 +136,6 @@ public class CommonServiceImpl implements CommonService {
 
     @Override
     public void updateSignInList(int class_id, int student_id) {
-        int week = OAUtil.getWeekOfSemester();
         int weekStartTime = (int) (DateUtil.getWeekBeginTimestamp(System.currentTimeMillis()) / 1000);
         try {
             SignIn signIn;
@@ -155,10 +154,12 @@ public class CommonServiceImpl implements CommonService {
                     } else {
                         signIn.setSigninIds(signinIds + "," + student_id);
                     }
-                    signInMapper.updateByPrimaryKey(signIn);
+                    signInMapper.updateByPrimaryKeySelective(signIn);
                 }
             } else if (signInList.isEmpty()) {
+                int week = OAUtil.getWeekOfSemester();
                 SignIn newSignIn = new SignIn();
+
                 newSignIn.setClassId(class_id);
                 newSignIn.setWeekStartTime(weekStartTime);
                 newSignIn.setWeek(week);

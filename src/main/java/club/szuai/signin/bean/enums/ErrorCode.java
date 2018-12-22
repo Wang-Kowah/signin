@@ -16,7 +16,7 @@ public enum ErrorCode {
 
     // 签到相关错误 5000
     LOCATION_TOO_FAR(5001, "定位离上课地点过远，签到失败"),
-    QRCODE_IS_NOT_VALID(5002,"二维码已过期，请重新扫码"),
+    QRCODE_IS_NOT_VALID(5002, "二维码已过期，请重新扫码"),
 
     // 用户相关错误码6000
     USER_IS_NOT_EXIST(6001, "用户不存在"),

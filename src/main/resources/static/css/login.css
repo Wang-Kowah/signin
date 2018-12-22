@@ -13,7 +13,7 @@ body {
     background-size: cover;
 }
 
-label{
+label {
     font-size: 18px;
     color: #fff;
 }
@@ -37,10 +37,10 @@ label{
     background: url(../images/login.png) 0 0 no-repeat;
 }
 
-.checkbox p{
+.checkbox p {
     color: #fff;
     font-size: 16px;
-    text-align:center;
+    text-align: center;
     margin-bottom: 3%;
 }
 

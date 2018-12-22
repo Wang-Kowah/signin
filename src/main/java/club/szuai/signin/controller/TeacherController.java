@@ -15,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -121,7 +120,7 @@ public class TeacherController {
             session.setMaxInactiveInterval(10 * 60);
             session.setAttribute("id", teacher_id);
 
-            String domain = request.getRequestURL().toString().replace("/tch/adminLogin", "");
+            String domain = request.getRequestURL().toString().split("/")[2].split(":")[0];
             Cookie nameCookie = new Cookie("user", name);
             Cookie idCookie = new Cookie("id", String.valueOf(teacher_id));
 
@@ -222,7 +221,6 @@ public class TeacherController {
             return result;
         }
 
-
         //本地调试时需要允许跨域访问
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "GET");
@@ -252,12 +250,13 @@ public class TeacherController {
         ErrorCode errorCode = ErrorCode.SUCCESS;
         String idStr = request.getParameter("class_id");
         String timeStr = request.getParameter("time");
-        int class_id,week_start_time;
+        int class_id, week_start_time;
         try {
             class_id = Integer.parseInt(idStr);
-            week_start_time = Integer.parseInt(timeStr);
+            long timestamp = Long.parseLong(timeStr);
+            week_start_time = (int) (DateUtil.getWeekBeginTimestamp(timestamp) / 1000);
         } catch (Exception e) {
-            logger.error("Parse error,classId={},weekStartTime={}", idStr,timeStr);
+            logger.error("Parse error,classId={},weekStartTime={}", idStr, timeStr);
             errorCode = ErrorCode.PARAM_ERROR;
             result.put("retcode", errorCode.getCode());
             result.put("msg", errorCode.getMsg());
@@ -271,9 +270,11 @@ public class TeacherController {
 
         Map<String, Object> params = new HashMap<>();
         params.put("classId", class_id);
-        List<SignIn> signInHistory = signInMapper.selectByClassId(params);
-        result.put("signinlist", signInHistory);
-
+        params.put("weekStartTime", week_start_time);
+        List<SignIn> signIn = signInMapper.selectByClassIdAndTime(params);
+        if (!signIn.isEmpty()) {
+            result.put("signinlist", signIn.get(0).getSigninIds().split(","));
+        }
         result.put("retcode", errorCode.getCode());
         result.put("msg", errorCode.getMsg());
         return result;
