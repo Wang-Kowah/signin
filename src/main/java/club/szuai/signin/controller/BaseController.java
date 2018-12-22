@@ -1,8 +1,12 @@
 package club.szuai.signin.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping(value = "/")
@@ -17,6 +21,14 @@ public class BaseController {
             return "/login.html#";
         }
         return "/login.html";
+    }
+
+    /**
+     * 后台页面
+     */
+    @RequestMapping("/dashboard/{page}")
+    public String dashboard(@PathVariable("page") String page) {
+        return "/"+page+".html";
     }
 
 }

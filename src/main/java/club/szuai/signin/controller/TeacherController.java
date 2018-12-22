@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,11 +23,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.net.HttpCookie;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/tch")
@@ -55,7 +58,7 @@ public class TeacherController {
      */
     @RequestMapping("/Admin")
     public String admin(HttpSession session) {
-        if (session.getAttribute("name") != null || session.getAttribute("id") != null) {
+        if (session.getAttribute("id") != null) {
             return "/admin.html";
         } else {
             return "redirect:/login.html";
@@ -116,8 +119,23 @@ public class TeacherController {
         if (errorCode.equals(ErrorCode.SUCCESS)) {
             HttpSession session = request.getSession();
             session.setMaxInactiveInterval(10 * 60);
-            session.setAttribute("name", name);
             session.setAttribute("id", teacher_id);
+
+            String domain = request.getRequestURL().toString().replace("/tch/adminLogin", "");
+            Cookie nameCookie = new Cookie("user", name);
+            Cookie idCookie = new Cookie("id", String.valueOf(teacher_id));
+
+            nameCookie.setDomain(domain);
+            idCookie.setDomain(domain);
+            nameCookie.setPath("/");
+            idCookie.setPath("/");
+            //本地调试使用localhost时，domain必须设置为""或null或false
+            if (domain.contains("localhost")) {
+                nameCookie.setDomain("");
+                idCookie.setDomain("");
+            }
+            response.addCookie(nameCookie);
+            response.addCookie(idCookie);
         }
         return new ModelAndView("redirect:/tch/Admin");
     }
@@ -168,6 +186,11 @@ public class TeacherController {
             return result;
         }
 
+        //本地调试时需要允许跨域访问
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET");
+        response.setHeader("'Access-Control-Allow-Headers", "x-requested-with,content-type");
+
         List<Class> classes = commonService.getTeachingClasses(teacher_id);
         if (classes.isEmpty()) {
             errorCode = ErrorCode.COURSE_IS_NOT_EXIST;
@@ -199,6 +222,12 @@ public class TeacherController {
             return result;
         }
 
+
+        //本地调试时需要允许跨域访问
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET");
+        response.setHeader("'Access-Control-Allow-Headers", "x-requested-with,content-type");
+
         Map<String, Object> nameMap = commonService.getNameList(class_id);
         if (nameMap.get("error").toString().equals("1")) {
             errorCode = ErrorCode.COURSE_IS_NOT_EXIST;
@@ -214,7 +243,7 @@ public class TeacherController {
     }
 
     /**
-     * 获取点名历史记录
+     * 获取某一周的点名记录
      */
     @RequestMapping(value = "/history")
     @ResponseBody
@@ -222,16 +251,23 @@ public class TeacherController {
         Map<String, Object> result = new HashMap<>();
         ErrorCode errorCode = ErrorCode.SUCCESS;
         String idStr = request.getParameter("class_id");
-        int class_id;
+        String timeStr = request.getParameter("time");
+        int class_id,week_start_time;
         try {
             class_id = Integer.parseInt(idStr);
+            week_start_time = Integer.parseInt(timeStr);
         } catch (Exception e) {
-            logger.error("Parse error,id={}", idStr);
+            logger.error("Parse error,classId={},weekStartTime={}", idStr,timeStr);
             errorCode = ErrorCode.PARAM_ERROR;
             result.put("retcode", errorCode.getCode());
             result.put("msg", errorCode.getMsg());
             return result;
         }
+
+        //本地调试时需要允许跨域访问
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET");
+        response.setHeader("'Access-Control-Allow-Headers", "x-requested-with,content-type");
 
         Map<String, Object> params = new HashMap<>();
         params.put("classId", class_id);

@@ -1,16 +1,21 @@
 <!doctype html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A layout example with a side menu that hides on mobile, just like the Pure website.">
+    <meta name="description"
+          content="A layout example with a side menu that hides on mobile, just like the Pure website.">
     <title>您好</title>
-    
-    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/layouts/side-menu.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-"
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="../css/layouts/side-menu.css">
 </head>
+
 <body>
-<script src="js/jquery.min.js"></script>
+<script src="../js/jquery.min.js"></script>
+<script src="../js/jquery.cookie.js"></script>
 
 <div id="layout">
     <!-- Menu toggle -->
@@ -28,10 +33,10 @@
                     <a href="" class="pure-menu-link">课程列表</a>
                 </li>
                 <li class="pure-menu-item">
-                    <a href="statistics.html" class="pure-menu-link">签到情况</a>
+                    <a href="statistics" class="pure-menu-link">签到情况</a>
                 </li>
                 <li class="pure-menu-item">
-                    <a href="contact.html" class="pure-menu-link">联系我们</a>
+                    <a href="contact" class="pure-menu-link">联系我们</a>
                 </li>
             </ul>
         </div>
@@ -44,16 +49,11 @@
         </div>
 
         <div class="content">
-            <div class="list" id="list"><ul class="pure-menu-list">
-                <h2 class="content-subhead">您本学期的课程</h2>
-                <!-- <p>点击课程显示对应的签到二维码</p> -->
-                <ul id="ul">
-                    <li>
-                        <a href="javascript:void(0)" class="pure-menu-link">1500030004,Java程序设计</a>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0)" class="pure-menu-link">1502880001,基于Web的编程</a>
-                    </li>
+            <div class="list" id="list">
+                <ul class="pure-menu-list">
+                    <h2 class="content-subhead">您本学期的课程</h2>
+                    <!-- <p>点击课程显示对应的签到二维码</p> -->
+                    <ul id="ul"></ul>
                 </ul>
             </div>
 
@@ -70,48 +70,62 @@
 </div>
 
 <script>
-    // window.onload = getClasses();
+    window.onload = getClasses();
 
-    $(document).ready(function(){
-        $("#ul li a").on('click', function(e) {
-            var str = $(e.target).html();
-            var classId = str.split(',')[0];
-            getQRCode(classId);
-            let i = 0;
-            window.setInterval(() => {
-                i ++;
-                $("#qrcode").attr("src","");    
-                $("#qrcode").attr("src","https://szuai.club:8888/signin/tch/QRCode?class_id="+classId+"&times="+i);    
-            }, 1000 * 30); 
+    function getClasses() {
+        var teacherName = $.cookie('user');
+        var teacherId = $.cookie('id');
+
+        $("title").html("您好，" + teacherName + "老师");
+
+        var template1 = "<li><a href=\"javascript:void(0)\" class=\"pure-menu-link\">";
+        var template2 = "</a></li>";
+
+        $.ajax({
+            url: "https://szuai.club:8888/signin/tch/classes",
+            data: {"id": teacherId},
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                console.log(data.classes);
+                var classes = data.classes;
+                var content = "";
+                for (var i in classes) {
+                    content += template1 + classes[i].classId + ',' + classes[i].name + template2;
+                }
+                $("#ul").html(content);
+
+
+                $("#ul li a").on('click', function (e) {
+                    var str = $(e.target).html();
+                    var classId = str.split(',')[0];
+                    $.cookie('classId', null);
+                    $.cookie('classId', classId);
+                    getQRCode(classId);
+                    let i = 0;
+                    window.setInterval(() => {
+                        i++;
+                        $("#qrcode").attr("src", "");
+                        $("#qrcode").attr("src", "https://szuai.club:8888/signin/tch/QRCode?class_id=" + classId + "&times=" + i);
+                    }, 1000 * 30);
+                });
+            }
         });
+    }
 
-        function getQRCode(classId){
-            $("#qrcode").attr("src","");
-            $("#qrcode").attr("src","https://szuai.club:8888/signin/tch/QRCode?class_id="+classId);
-            $("#code").attr("style","");
-            $("#list").attr("style","display:none");
-            $(".header h1").html("扫码签到");
-            $(".header h2").attr("style","display:none");
-            $("#tips").attr("style","");
-        }
-
-    });
-
-    // function getClasses(){
-    //     var teacherId = ${sessionScope.id};
-    //     $.ajax({
-    //         url: "https://szuai.club:8888/signin/tch/classes",
-    //         data: {"id": teacherId},
-    //         type: "GET",
-    //         dataType: "json",
-    //         success: function(data) {
-    //             console.log(data);
-    //         }
-    //     });
-    // }
+    function getQRCode(classId) {
+        $("#qrcode").attr("src", "");
+        $("#qrcode").attr("src", "https://szuai.club:8888/signin/tch/QRCode?class_id=" + classId);
+        $("#code").attr("style", "");
+        $("#list").attr("style", "display:none");
+        $(".header h1").html("扫码签到");
+        $(".header h2").attr("style", "display:none");
+        $("#tips").attr("style", "");
+    }
 
 </script>
-<script src="js/ui.js"></script>
+<script src="../js/ui.js"></script>
 
 </body>
+
 </html>

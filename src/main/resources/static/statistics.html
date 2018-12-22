@@ -9,17 +9,14 @@
 
     <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-"
           crossorigin="anonymous">
-    <link rel="stylesheet" href="css/layouts/side-menu.css">
+    <link rel="stylesheet" href="../css/layouts/side-menu.css">
 </head>
 <body>
+    <script src="../js/jquery.min.js"></script>
+    <script src="../js/jquery.cookie.js"></script>
 
 
 <div id="layout">
-    <!-- Menu toggle -->
-    <a href="#menu" id="menuLink" class="menu-link">
-        <!-- Hamburger icon -->
-        <span></span>
-    </a>
 
     <div id="menu">
         <div class="pure-menu">
@@ -27,14 +24,14 @@
 
             <ul class="pure-menu-list">
                 <li class="pure-menu-item">
-                    <a href="manage.html" class="pure-menu-link">课程列表</a>
+                    <a href="manage" class="pure-menu-link">课程列表</a>
                 </li>
                 <li class="pure-menu-item menu-item-divided pure-menu-selected">
                     <a href="" class="pure-menu-link">签到情况</a>
                 </li>
 
                 <li class="pure-menu-item">
-                    <a href="contact.html" class="pure-menu-link">联系我们</a>
+                    <a href="contact" class="pure-menu-link">联系我们</a>
                 </li>
             </ul>
         </div>
@@ -43,7 +40,7 @@
     <div id="main">
         <div class="header">
             <h1>签到情况</h1>
-            <h2>1为已签到，0为未签到</h2>
+            <h2>如有学生签到失败可以手动签到</h2>
         </div>
 
         <div class="content">
@@ -63,48 +60,23 @@
                         <td>1</td>
                         <td>2016150001</td>
                         <td>学生1</td>
-                        <td>1</td>
+                        <td>√</td>
                     </tr>
                     <tr>
                         <td>2</td>
                         <td>2016150002</td>
                         <td>学生2</td>
-                        <td>0</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>2016150003</td>
-                        <td>学生3</td>
-                        <td>1</td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>2016154004</td>
-                        <td>学生4</td>
-                        <td>1</td>
-                    </tr>
-                    <tr>
-                        <td>5</td>
-                        <td>2016154005</td>
-                        <td>学生5</td>
-                        <td>0</td>
-                    </tr>
-                    <tr>
-                        <td>6</td>
-                        <td>2016150006</td>
-                        <td>学生6</td>
-                        <td>1</td>
+                        <td>×</td>
                     </tr>
                     </tbody>
                 </table>
             </div>
 
-
             <form class="pure-form" action="/signin/stu/updateStauts" method="post">
                 <fieldset>
                     <legend>手动签到</legend>
                     <input name="stu_id" type="text" autocomplete="off" placeholder="需要手动签到的学号">
-                    <input name="class_id" type="hidden" value="">
+                    <input name="class_id" id="hidden" type="hidden" value="">
                     <button type="submit" class="pure-button pure-button-primary">登录</button>
                 </fieldset>
             </form>
@@ -112,7 +84,51 @@
         </div>
     </div>
 </div>
-<script src="js/ui.js"></script>
+
+<script>
+    window.onload = getList();
+
+    function getList() {
+        var classId = $.cookie('classId');
+        $("#hidden").attr("value",classId);
+
+        var template = "<tr><td>2</td><td>2016150002</td><td>学生2</td><td>×</td></tr>";
+
+        $.ajax({
+            url: "https://szuai.club:8888/signin/tch/nameList",
+            data: {"class_id": classId},
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                console.log(data);
+                var content = "";
+                for (var i=0;i<data.idlist.length;i++) {
+                    content += "<tr><td>"+(i+1)+"</td><td>"+data.idlist[i]+"</td><td>"+data.namelist[i]+"</td><td id=\""+data.idlist[i]+"\">×</td></tr>";
+                }
+                $("tbody").html(content);
+                update();
+            }
+        });
+    }
+
+    function update(){
+        $.ajax({
+            url: "https://szuai.club:8888/signin/tch/history",
+            data: {"class_id": classId,"time":getTime()/1000},
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                console.log(data);
+                var list = data.signinlist;
+                for (var i in list) {
+                    $("#"+i).html("√");
+                }
+            }
+        });
+    }
+
+</script>
+<script src="../js/ui.js"></script>
 
 </body>
 </html>
