@@ -20,4 +20,5 @@ public interface TeacherMapper {
 
     List<Teacher> getList(Map<String, Object> params);
 
+    Teacher selectByIdAndPassword(Map<String, Object> params);
 }

@@ -22,4 +22,5 @@ public interface StudentMapper {
 
     Student selectByCardId(Integer cardId);
 
+    Student selectByStuIdAndPassword(Map<String, Object> params);
 }

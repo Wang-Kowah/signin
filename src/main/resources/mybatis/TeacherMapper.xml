@@ -24,7 +24,7 @@
     <insert id="insert" parameterType="club.szuai.signin.bean.Teacher">
     insert into t_teacher_list (teacher_id, name, password, 
       create_time, class_ids)
-    values (#{teacherId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+    values (#{teacherId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, MD5(#{password,jdbcType=VARCHAR}),
       #{createTime,jdbcType=INTEGER}, #{classIds,jdbcType=VARCHAR})
   </insert>
     <insert id="insertSelective" parameterType="club.szuai.signin.bean.Teacher">
@@ -71,7 +71,7 @@
                 name = #{name,jdbcType=VARCHAR},
             </if>
             <if test="password != null">
-                password = #{password,jdbcType=VARCHAR},
+                password = MD5(#{password,jdbcType=VARCHAR}),
             </if>
             <if test="createTime != null">
                 create_time = #{createTime,jdbcType=INTEGER},
@@ -85,7 +85,7 @@
     <update id="updateByPrimaryKey" parameterType="club.szuai.signin.bean.Teacher">
     update t_teacher_list
     set name = #{name,jdbcType=VARCHAR},
-      password = #{password,jdbcType=VARCHAR},
+      password = MD5(#{password,jdbcType=VARCHAR}),
       create_time = #{createTime,jdbcType=INTEGER},
       class_ids = #{classIds,jdbcType=VARCHAR}
     where teacher_id = #{teacherId,jdbcType=INTEGER}
@@ -94,5 +94,11 @@
         SELECT * FROM t_teacher_list
         ORDER BY `teacher_id` DESC
         <if test="null != limit">LIMIT #{limit}</if>
+    </select>
+    <select id="selectByIdAndPassword" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List"/>
+        from t_teacher_list
+        where teacher_id = #{teacherId,jdbcType=INTEGER} and password = MD5( #{password,jdbcType=VARCHAR})
     </select>
 </mapper>

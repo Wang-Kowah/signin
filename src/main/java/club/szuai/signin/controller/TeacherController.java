@@ -86,17 +86,16 @@ public class TeacherController {
             errorCode = ErrorCode.PARAM_ERROR;
             result.put("retcode", errorCode.getCode());
             result.put("msg", errorCode.getMsg());
-            return new ModelAndView("redirect:/login.html#");
+            return new ModelAndView("redirect:/login?error=1");
         }
 
         String name;
-        Teacher teacher = teacherMapper.selectByPrimaryKey(teacher_id);
+        Map<String, Object> params = new HashMap<>();
+        params.put("teacherId", teacher_id);
+        params.put("password", pwStr);
+        Teacher teacher = teacherMapper.selectByIdAndPassword(params);
         if (teacher != null) {
-            if (teacher.getPassword().equals(pwStr)) {
-                name = teacher.getName();
-            } else {
-                return new ModelAndView("redirect:/login.html#");
-            }
+            name = teacher.getName();
         } else {
             //数据库中找不到该老师时通过OA来验证身份
             logger.info("Card_id:{} not found,trying to login OA", teacher_id);
@@ -136,7 +135,7 @@ public class TeacherController {
             response.addCookie(nameCookie);
             response.addCookie(idCookie);
         }
-        return new ModelAndView("redirect:/tch/Admin");
+        return new ModelAndView("redirect:/tch/Admin?token=dGhpcyBpcyBhIHRva2Vu");
     }
 
     /**

@@ -7,14 +7,17 @@ Page({
     motto: '请先登录',
     userInfo: {},
     hasUserInfo: false,
+    lat: 0,
+    lng: 0,
+    hasLocation: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo')
   },
   //事件处理函数
-  bindViewTap: function() {
+  // bindViewTap: function() {
     // wx.navigateTo({
     //   url: '../signin/signin'
     // })
-  },
+  // },
   onLoad: function() {
     if (app.globalData.userInfo) {
       this.setData({
@@ -42,17 +45,15 @@ Page({
         }
       })
     }
+    var that = this;
+    wx.clearStorage()
     wx.getLocation({
       type: 'wgs84',
       success(res) {
         console.log(res);
-        wx.setStorage({
-          key: 'lat',
-          data: res.latitude,
-        })
-        wx.setStorage({
-          key: 'lng',
-          data: res.longitude,
+        that.setData({
+          lat: res.latitude,
+          lng: res.longitude
         })
       }
     })
@@ -60,6 +61,7 @@ Page({
   formSubmit(e) {
     console.log('form发生了submit事件，携带数据为：', e.detail.value)
 
+    var that = this;
     if (e.detail.value.id.length == 0) {
       wx.showToast({
         title: '学号不得为空!',
@@ -102,9 +104,9 @@ Page({
               data: e.detail.value.id,
             })
             wx.navigateTo({
-              url: '../signin/signin'
+              url: '../signin/signin?lat=' + that.data.lat + "&lng=" + that.data.lng
             })
-          }else{
+          } else {
             wx.showToast({
               title: '学号或密码错误',
               icon: "none",

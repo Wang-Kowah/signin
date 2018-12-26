@@ -1,6 +1,9 @@
 var app = getApp()
 Page({
-  data: {},
+  data: {
+    lat: 0,
+    lng: 0
+  },
   //调用扫码功能
   callQRcode: function() {
     wx.scanCode({
@@ -17,18 +20,20 @@ Page({
               stu_id = res.data;
             },
           })
-          wx.getStorage({
-            key: 'lat',
-            success: function(res) {
-              latitude = res.data;
-            },
-          })
-          wx.getStorage({
-            key: 'lng',
-            success: function(res) {
-              longitude = res.data;
-            },
-          })
+          // wx.getStorage({
+          //   key: 'lat',
+          //   success: function(res) {
+          //     latitude = res.data;
+          //   },
+          // })
+          // wx.getStorage({
+          //   key: 'lng',
+          //   success: function(res) {
+          //     longitude = res.data;
+          //   },
+          // })
+          latitude = this.data.lat;
+          longitude = this.data.lng;
           wx.request({
             url: api + "/signin",
             method: "POST",
@@ -42,7 +47,7 @@ Page({
               "Content-Type": "application/x-www-form-urlencoded"
             },
             success: function(res) {
-              if (res.data.retcode==0) {
+              if (res.data.retcode == 0) {
                 wx.showToast({
                   title: "签到成功",
                   icon: "none",
@@ -88,28 +93,11 @@ Page({
       }
     });
   },
-  onLoad: function() {
+  onLoad: function(options) {
     console.log('Signin onLoad')
-    wx.getStorage({
-      key: 'lat',
-      success: function (res) {
-        if(res.data==null){
-          wx.getLocation({
-            type: 'wgs84',
-            success(res) {
-              console.log(res);
-              wx.setStorage({
-                key: 'lat',
-                data: res.latitude,
-              })
-              wx.setStorage({
-                key: 'lng',
-                data: res.longitude,
-              })
-            }
-          })
-        }
-      },
+    this.setData({
+      lat: options.lat,
+      lng: options.lng
     })
   }
 })

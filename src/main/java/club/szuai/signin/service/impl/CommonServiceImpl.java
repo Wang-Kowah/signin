@@ -54,7 +54,7 @@ public class CommonServiceImpl implements CommonService {
                 classes.add(classMapper.selectByPrimaryKey(Integer.parseInt(class_id)));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return classes;
         }
         return classes;
@@ -69,7 +69,7 @@ public class CommonServiceImpl implements CommonService {
                 classes.add(classMapper.selectByPrimaryKey(Integer.parseInt(class_id)));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             return classes;
         }
         return classes;
@@ -88,7 +88,7 @@ public class CommonServiceImpl implements CommonService {
             }
             result.put("error", 0);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             result.put("error", 1);
         }
         result.put("idList", idList);
@@ -107,7 +107,7 @@ public class CommonServiceImpl implements CommonService {
             result.put("lng", location.getLng());
             result.put("error", 0);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
             result.put("error", 1);
         }
         return result;
@@ -129,7 +129,7 @@ public class CommonServiceImpl implements CommonService {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         return nameList;
     }
@@ -167,7 +167,7 @@ public class CommonServiceImpl implements CommonService {
                 signInMapper.insertAndGetId(newSignIn);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
@@ -186,7 +186,7 @@ public class CommonServiceImpl implements CommonService {
                 studentMapper.updateByPrimaryKey(student);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 

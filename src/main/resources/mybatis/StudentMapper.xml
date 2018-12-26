@@ -28,7 +28,7 @@
     insert into t_student_list (student_id,card_id, name, password,
       create_time, class_ids, sex, 
       wechat)
-    values (#{studentId,jdbcType=INTEGER}, #{studentId,jdbcType=INTEGER},#{name,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
+    values (#{studentId,jdbcType=INTEGER}, #{studentId,jdbcType=INTEGER},#{name,jdbcType=VARCHAR},MD5(#{password,jdbcType=VARCHAR}),
       #{createTime,jdbcType=INTEGER}, #{classIds,jdbcType=VARCHAR}, #{sex,jdbcType=INTEGER}, 
       #{wechat,jdbcType=VARCHAR})
   </insert>
@@ -71,7 +71,7 @@
                 #{name,jdbcType=VARCHAR},
             </if>
             <if test="password != null">
-                #{password,jdbcType=VARCHAR},
+               MD5( #{password,jdbcType=VARCHAR}),
             </if>
             <if test="createTime != null">
                 #{createTime,jdbcType=INTEGER},
@@ -97,7 +97,7 @@
                 name = #{name,jdbcType=VARCHAR},
             </if>
             <if test="password != null">
-                password = #{password,jdbcType=VARCHAR},
+                password = MD5(#{password,jdbcType=VARCHAR}),
             </if>
             <if test="createTime != null">
                 create_time = #{createTime,jdbcType=INTEGER},
@@ -119,7 +119,7 @@
     set
       card_id = #{cardId,jdbcType=INTEGER},
       name = #{name,jdbcType=VARCHAR},
-      password = #{password,jdbcType=VARCHAR},
+      password = MD5(#{password,jdbcType=VARCHAR}),
       create_time = #{createTime,jdbcType=INTEGER},
       class_ids = #{classIds,jdbcType=VARCHAR},
       sex = #{sex,jdbcType=INTEGER},
@@ -136,5 +136,11 @@
         <include refid="Base_Column_List"/>
         from t_student_list
         where card_id = #{cardId,jdbcType=INTEGER}
+    </select>
+    <select id="selectByStuIdAndPassword" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List"/>
+        from t_student_list
+        where student_id = #{studentId,jdbcType=INTEGER} and password = MD5( #{password,jdbcType=VARCHAR})
     </select>
 </mapper>

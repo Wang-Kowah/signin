@@ -35,9 +35,9 @@ public class StudentController {
     private static final int DEFUALT_UNIT_COUNT_PAGES = 10;
 
     /**
-     * 默认签到范围为250m
+     * 默认签到范围为500m
      */
-    private static final int DEFUALT_SIGN_IN_DISTANCE = 250;
+    private static final int DEFUALT_SIGN_IN_DISTANCE = 500;
 
     @Autowired
     private CommonService commonService;
@@ -98,13 +98,12 @@ public class StudentController {
         }
 
 //        Student student = studentMapper.selectByCardId(card_id);
-        Student student = studentMapper.selectByPrimaryKey(student_id);
+        Map<String, Object> params = new HashMap<>();
+        params.put("studentId", student_id);
+        params.put("password", pwStr);
+        Student student = studentMapper.selectByStuIdAndPassword(params);
         if (student != null) {
-            if (student.getPassword().equals(pwStr)) {
-                result.put("name", student.getName());
-            } else {
-                errorCode = ErrorCode.LOGIN_FAIL;
-            }
+            result.put("name", student.getName());
         } else {
             //数据库中找不到该学生时通过OA来验证身份
             logger.debug("Student_id:{} not found,trying to login OA", student_id);
@@ -211,6 +210,7 @@ public class StudentController {
 
                 if (distance > DEFUALT_SIGN_IN_DISTANCE) {
                     errorCode = ErrorCode.LOCATION_TOO_FAR;
+                    logger.info("Sign in fail,stuId={},distance={}");
                 }
                 result.put("distance", distance);
             } catch (Exception e) {
