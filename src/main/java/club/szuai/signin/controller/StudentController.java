@@ -210,7 +210,7 @@ public class StudentController {
 
                 if (distance > DEFUALT_SIGN_IN_DISTANCE) {
                     errorCode = ErrorCode.LOCATION_TOO_FAR;
-                    logger.info("Sign in fail,stuId={},distance={}");
+                    logger.info("Sign in fail,classId={},distance={}",class_id,distance);
                 }
                 result.put("distance", distance);
             } catch (Exception e) {

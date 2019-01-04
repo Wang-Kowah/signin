@@ -20,18 +20,6 @@ Page({
               stu_id = res.data;
             },
           })
-          // wx.getStorage({
-          //   key: 'lat',
-          //   success: function(res) {
-          //     latitude = res.data;
-          //   },
-          // })
-          // wx.getStorage({
-          //   key: 'lng',
-          //   success: function(res) {
-          //     longitude = res.data;
-          //   },
-          // })
           latitude = this.data.lat;
           longitude = this.data.lng;
           wx.request({
